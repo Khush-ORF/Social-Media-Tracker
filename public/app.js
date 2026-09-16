@@ -123,11 +123,11 @@ async function load() {
   let snapshots;
   try {
     [latest, snapshots] = await Promise.all([
-      fetch('/api/latest').then(res => {
+      fetch('api/latest').then(res => {
         if (!res.ok) throw new Error('API unavailable');
         return res.json();
       }),
-      fetch('/api/snapshots').then(res => {
+      fetch('api/snapshots').then(res => {
         if (!res.ok) throw new Error('API unavailable');
         return res.json();
       }),
@@ -135,8 +135,8 @@ async function load() {
     state.staticMode = false;
   } catch {
     [latest, snapshots] = await Promise.all([
-      fetch('/data/latest.json').then(res => res.ok ? res.json() : { generated_at: null, rows: [] }),
-      fetch('/data/snapshots.json').then(res => res.ok ? res.json() : { rows: [] }),
+      fetch('data/latest.json').then(res => res.ok ? res.json() : { generated_at: null, rows: [] }),
+      fetch('data/snapshots.json').then(res => res.ok ? res.json() : { rows: [] }),
     ]);
     state.staticMode = true;
   }
@@ -159,7 +159,7 @@ async function runNow() {
   button.textContent = 'Starting...';
   try {
     const platform = el('runPlatform').value;
-    const res = await fetch('/api/run', {
+    const res = await fetch('api/run', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ platform }),
@@ -178,7 +178,7 @@ async function pollRunStatus() {
   const button = el('runNow');
   button.disabled = true;
   while (true) {
-    const payload = await fetch('/api/run-status').then(res => res.json());
+    const payload = await fetch('api/run-status').then(res => res.json());
     const status = payload.status || {};
     const tail = String(status.stdout || status.stderr || '').trim().split(/\r?\n/).slice(-3).join(' · ');
     el('runStatus').textContent = status.state === 'running'
