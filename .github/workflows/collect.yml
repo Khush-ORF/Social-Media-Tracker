@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 22
       - run: sudo apt-get update && sudo apt-get install -y sqlite3
-      - run: npm ci
+      - run: npm install
       - run: npx playwright install --with-deps chromium
       - name: Collect selected platform or all on month end
         shell: bash
