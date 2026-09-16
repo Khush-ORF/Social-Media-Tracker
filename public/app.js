@@ -2,6 +2,7 @@ const state = {
   latest: [],
   snapshots: [],
   staticMode: false,
+  triggerEndpoint: '',
 };
 
 const fmt = new Intl.NumberFormat('en-US');
@@ -142,31 +143,54 @@ async function load() {
   }
   state.latest = latest.rows || [];
   state.snapshots = snapshots.rows || [];
+  state.triggerEndpoint = await loadTriggerEndpoint();
   el('subtitle').textContent = latest.generated_at
     ? `Latest generated ${latest.generated_at}${state.staticMode ? ' · static GitHub Pages mode' : ''}`
     : 'No snapshots yet';
-  el('runNow').disabled = state.staticMode;
-  if (state.staticMode) el('runStatus').textContent = 'Static mode: use GitHub Actions to collect new data.';
+  el('runNow').disabled = state.staticMode && !state.triggerEndpoint;
+  if (state.staticMode) {
+    el('runStatus').textContent = state.triggerEndpoint
+      ? 'Static mode: button triggers GitHub Actions through the configured trigger endpoint.'
+      : 'Static mode: configure public/trigger-config.json to enable the website fetch button.';
+  }
   renderStats(state.latest);
   renderLatest();
   renderHistory();
 }
 
+async function loadTriggerEndpoint() {
+  try {
+    const response = await fetch('trigger-config.json', { cache: 'no-store' });
+    if (!response.ok) return '';
+    const config = await response.json();
+    return String(config.collectEndpoint || '').trim();
+  } catch {
+    return '';
+  }
+}
+
 async function runNow() {
-  if (state.staticMode) return;
   const button = el('runNow');
   button.disabled = true;
   button.textContent = 'Starting...';
   try {
     const platform = el('runPlatform').value;
-    const res = await fetch('api/run', {
+    const endpoint = state.staticMode ? state.triggerEndpoint : 'api/run';
+    if (!endpoint) throw new Error('No collection endpoint configured for static deployment.');
+    const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ platform }),
     });
     const payload = await res.json();
     if (!payload.ok) throw new Error(payload.error || 'Fetch failed');
-    await pollRunStatus();
+    if (state.staticMode) {
+      el('runStatus').textContent = `GitHub Actions collection started${platform ? ` for ${platform}` : ' for all platforms'}. Refresh after the workflow finishes.`;
+      button.disabled = false;
+      button.textContent = 'Run fetch now';
+    } else {
+      await pollRunStatus();
+    }
   } catch (error) {
     alert(error.message);
     button.disabled = false;

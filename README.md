@@ -157,7 +157,29 @@ The local dashboard has a `Run fetch now` button.
 
 Locally, this starts a background collector job through the local server. The status line shows live progress while the job runs.
 
-On GitHub Pages, the dashboard runs in static mode. Static mode cannot directly scrape platforms from the browser. Use GitHub Actions for collection.
+On GitHub Pages, the dashboard runs in static mode. A static page cannot safely store a GitHub token, so the button needs a tiny trigger endpoint to start GitHub Actions.
+
+This repo includes a Cloudflare Worker trigger in:
+
+```text
+worker/collect-trigger.js
+```
+
+After deploying that Worker, update:
+
+```text
+public/trigger-config.json
+```
+
+with:
+
+```json
+{
+  "collectEndpoint": "https://your-worker-name.your-subdomain.workers.dev"
+}
+```
+
+Then the website button will trigger the `Collect Follower Counts` GitHub Actions workflow.
 
 ## Data Files
 
@@ -397,4 +419,3 @@ This project is designed for zero-dollar operation:
 - No paid scraping services
 
 Reliability depends on public platform behavior.
-
