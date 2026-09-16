@@ -31,7 +31,7 @@ jobs:
         run: |
           set -euo pipefail
           PLATFORM="${{ github.event.inputs.platform || '' }}"
-          if [[ -z "$PLATFORM" && "$(date -u -d tomorrow +%d)" != "01" ]]; then
+          if [[ "${{ github.event_name }}" == "schedule" && -z "$PLATFORM" && "$(date -u -d tomorrow +%d)" != "01" ]]; then
             echo "Not the last UTC day of the month; skipping scheduled collection."
             exit 0
           fi
