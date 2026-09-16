@@ -15,18 +15,34 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function platformDelay(platform) {
+  const githubActions = process.env.GITHUB_ACTIONS === 'true';
+  if (!githubActions) return 500;
+  if (platform === 'Instagram') return 12000;
+  if (platform === 'X') return 3500;
+  if (platform === 'Facebook') return 2500;
+  if (platform === 'LinkedIn') return 1500;
+  return 750;
+}
+
 async function fetchStatic(url) {
-  const response = await fetch(url, {
-    redirect: 'follow',
-    signal: AbortSignal.timeout(35000),
-    headers: {
-      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36',
-      'accept-language': 'en-US,en;q=0.9',
-      accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    },
-  });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return { html: await response.text(), source_url: response.url, fetch_method: 'static' };
+  let lastError;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const response = await fetch(url, {
+      redirect: 'follow',
+      signal: AbortSignal.timeout(35000),
+      headers: {
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36',
+        'accept-language': 'en-US,en;q=0.9',
+        accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      },
+    });
+    if (response.ok) return { html: await response.text(), source_url: response.url, fetch_method: 'static' };
+    lastError = new Error(`HTTP ${response.status}`);
+    if (![403, 429, 500, 502, 503, 504].includes(response.status)) throw lastError;
+    await sleep(4000 * (attempt + 1));
+  }
+  throw lastError;
 }
 
 async function fetchRendered(url, platform) {
@@ -75,7 +91,9 @@ async function collectOne(account, runId) {
   };
 
   let firstError = '';
-  for (const fetcher of [fetchStatic, fetchRendered]) {
+  const renderedFirst = process.env.GITHUB_ACTIONS === 'true' && ['X', 'Instagram'].includes(account.platform);
+  const fetchers = renderedFirst ? [fetchRendered, fetchStatic] : [fetchStatic, fetchRendered];
+  for (const fetcher of fetchers) {
     try {
       const page = await fetcher(account.profile_url, account.platform);
       const parsed = parseMetric(account.platform, page.html) || parseFromText(account.platform, page.html);
@@ -92,7 +110,7 @@ async function collectOne(account, runId) {
         };
       }
       firstError ||= 'count not found in public page';
-      if (page.fetch_method === 'playwright') {
+      if (fetcher === fetchers.at(-1)) {
         return {
           ...base,
           status: 'count_not_found',
@@ -103,8 +121,8 @@ async function collectOne(account, runId) {
       }
     } catch (error) {
       firstError ||= error.message;
-      if (fetcher === fetchRendered) {
-        return { ...base, status: 'failed', error: firstError, fetch_method: 'playwright' };
+      if (fetcher === fetchers.at(-1)) {
+        return { ...base, status: 'failed', error: firstError, fetch_method: fetcher === fetchRendered ? 'playwright' : 'static' };
       }
     }
   }
@@ -123,7 +141,7 @@ async function main() {
     const row = await collectOne(account, runId);
     rows.push(row);
     console.log(`${row.status}${row.count ? ` (${row.count})` : row.error ? ` - ${row.error}` : ''}`);
-    await sleep(500);
+    await sleep(platformDelay(account.platform));
   }
   await appendSnapshots(rows);
   await writeRun(runId, rows);
