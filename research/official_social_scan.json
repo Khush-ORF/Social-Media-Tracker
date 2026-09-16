@@ -1,0 +1,2651 @@
+{
+  "generated_at": "2026-09-16T08:55:04.063Z",
+  "results": [
+    {
+      "id": 1,
+      "name": "ACET (African Center for Economic Transformation)",
+      "website": "https://acetforafrica.org",
+      "final_url": "https://acetforafrica.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/acetforafrica",
+          "handle": "company/acetforafrica"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/acetforafrica/",
+          "handle": "acetforafrica"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/acetforafrica/",
+          "handle": "acetforafrica"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/acetforafrica",
+          "handle": "acetforafrica"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/acetforafrica",
+          "handle": "user/acetforafrica"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 2,
+      "name": "Africa Center",
+      "website": "https://www.atlanticcouncil.org/programs/africa-center/",
+      "final_url": "https://www.atlanticcouncil.org/programs/africa-center/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/acafricacenter",
+          "handle": "acafricacenter"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/showcase/atlantic-council-africa-center",
+          "handle": "showcase/atlantic-council-africa-center"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 3,
+      "name": "Al Jazeera Centre for Studies",
+      "website": "https://studies.aljazeera.net/en",
+      "final_url": "https://studies.aljazeera.net/en",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/ajstudies",
+          "handle": "ajstudies"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/AJStudies",
+          "handle": "AJStudies"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/ajstudies",
+          "handle": "ajstudies"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/aljazeerasc?sub_confirmation=1",
+          "handle": "user/aljazeerasc"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 4,
+      "name": "American Enterprise Institute",
+      "website": "https://www.aei.org",
+      "final_url": "https://www.aei.org/",
+      "method": "playwright",
+      "links": [],
+      "error": ""
+    },
+    {
+      "id": 5,
+      "name": "ASPI (Australian Strategic Policy Institute)",
+      "website": "https://www.aspi.org.au",
+      "final_url": "https://www.aspi.org.au/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/ASPI_org",
+          "handle": "ASPI_org"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/aspi_org/",
+          "handle": "aspi_org"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/ASPI.org/",
+          "handle": "ASPI.org"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/ASPICanberra",
+          "handle": "user/ASPICanberra"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/australian-strategic-policy-institute",
+          "handle": "company/australian-strategic-policy-institute"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 6,
+      "name": "Association for Democratic Reforms",
+      "website": "https://adrindia.org",
+      "final_url": "https://adrindia.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/adrspeaks",
+          "handle": "user/adrspeaks"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/adr.new/",
+          "handle": "adr.new"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/adrspeaks",
+          "handle": "adrspeaks"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/adrspeaks/",
+          "handle": "adrspeaks"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 7,
+      "name": "Atlantic Council",
+      "website": "https://www.atlanticcouncil.org",
+      "final_url": "https://www.atlanticcouncil.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "http://x.com/atlanticcouncil/",
+          "handle": "atlanticcouncil"
+        },
+        {
+          "platform": "Facebook",
+          "url": "http://facebook.com/atlanticcouncil/",
+          "handle": "atlanticcouncil"
+        },
+        {
+          "platform": "YouTube",
+          "url": "http://youtube.com/atlanticcouncil",
+          "handle": "atlanticcouncil"
+        },
+        {
+          "platform": "Instagram",
+          "url": "http://instagram.com/atlanticcouncil/",
+          "handle": "atlanticcouncil"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "http://www.linkedin.com/company/atlantic-council",
+          "handle": "company/atlantic-council"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 8,
+      "name": "Belfer Center",
+      "website": "https://www.belfercenter.org",
+      "final_url": "https://www.belfercenter.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/belfercenter/",
+          "handle": "company/belfercenter"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/belfercenter/",
+          "handle": "belfercenter"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/BelferCenter",
+          "handle": "user/BelferCenter"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/belfercenter/",
+          "handle": "belfercenter"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 9,
+      "name": "Bipartisan Policy Center",
+      "website": "https://bipartisanpolicy.org",
+      "final_url": "https://bipartisanpolicy.org/",
+      "method": "playwright",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://facebook.com/BipartisanPolicyCenter",
+          "handle": "BipartisanPolicyCenter"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/BPC_Bipartisan",
+          "handle": "BPC_Bipartisan"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://instagram.com/bpc_bipartisan",
+          "handle": "bpc_bipartisan"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://youtube.com/user/BipartisanPolicy",
+          "handle": "user/BipartisanPolicy"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://linkedin.com/company/bipartisan-policy-center",
+          "handle": "company/bipartisan-policy-center"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 10,
+      "name": "Brookings",
+      "website": "https://www.brookings.edu",
+      "final_url": "https://www.brookings.edu/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/BrookingsInst",
+          "handle": "BrookingsInst"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/brookings",
+          "handle": "brookings"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/the-brookings-institution",
+          "handle": "company/the-brookings-institution"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/BrookingsInstitution",
+          "handle": "user/BrookingsInstitution"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/brookingsinst/",
+          "handle": "brookingsinst"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 11,
+      "name": "Bruegel",
+      "website": "https://www.bruegel.org",
+      "final_url": "https://www.bruegel.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/bruegel",
+          "handle": "company/bruegel"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/BruegelTV",
+          "handle": "user/BruegelTV"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/bruegel_thinktank/",
+          "handle": "bruegel_thinktank"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 12,
+      "name": "Carnegie Endowment for International Peace",
+      "website": "https://carnegieendowment.org",
+      "final_url": "https://carnegieendowment.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/CarnegieEndow",
+          "handle": "CarnegieEndow"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://facebook.com/carnegieendowment",
+          "handle": "carnegieendowment"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://linkedin.com/company/carnegieendowment",
+          "handle": "company/carnegieendowment"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://youtube.com/CarnegieEndowment",
+          "handle": "CarnegieEndowment"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://instagram.com/carnegieendow",
+          "handle": "carnegieendow"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 13,
+      "name": "Cato Institute",
+      "website": "https://www.cato.org",
+      "final_url": "https://www.cato.org/",
+      "method": "playwright",
+      "links": [],
+      "error": ""
+    },
+    {
+      "id": 14,
+      "name": "Center for a New American Security",
+      "website": "https://www.cnas.org",
+      "final_url": "https://www.cnas.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/cnasdc",
+          "handle": "cnasdc"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/CNASdc",
+          "handle": "user/CNASdc"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/CNASdc",
+          "handle": "CNASdc"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/center-for-a-new-american-security/",
+          "handle": "company/center-for-a-new-american-security"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://instagram.com/cnasdc",
+          "handle": "cnasdc"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 15,
+      "name": "Centre for Air Power Studies",
+      "website": "https://capsindia.org",
+      "final_url": "https://capssindia.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://in.linkedin.com/in/centre-for-aerospace-power-and-strategic-studies-capss-4216ab82",
+          "handle": "in/centre-for-aerospace-power-and-strategic-studies-capss-4216ab82"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/caps_india",
+          "handle": "caps_india"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://youtu.be/289fZEJQTqM?si=KNKjUEjX1dViw_wm",
+          "handle": "289fZEJQTqM"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 16,
+      "name": "Centre for Budget and Governance Accountability",
+      "website": "https://www.cbgaindia.org",
+      "final_url": "https://www.cbgaindia.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/CBGAIndia",
+          "handle": "CBGAIndia"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/centre-for-budget-and-governance-accountability-cbga-",
+          "handle": "company/centre-for-budget-and-governance-accountability-cbga-"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/CBGAIndia",
+          "handle": "CBGAIndia"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UCIve0XhNPeY5on7UPjQeRtg",
+          "handle": "channel/UCIve0XhNPeY5on7UPjQeRtg"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 17,
+      "name": "Centre for Budget and Policy Studies",
+      "website": "https://cbps.in",
+      "final_url": "https://cbps.in/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://in.linkedin.com/company/cbpsblr",
+          "handle": "company/cbpsblr"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/cbpsblr/",
+          "handle": "cbpsblr"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/Centre-for-Budget-and-Policy-Studies-191158970935880/?pnref=about.overview",
+          "handle": "Centre-for-Budget-and-Policy-Studies-191158970935880"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/CBPSMedia",
+          "handle": "user/CBPSMedia"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/CbpsBlr",
+          "handle": "CbpsBlr"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 18,
+      "name": "Centre for Civil Society",
+      "website": "https://ccs.in",
+      "final_url": "https://ccs.in/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/ccsindia",
+          "handle": "ccsindia"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/ccsindia",
+          "handle": "ccsindia"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/c/ccsindiatv",
+          "handle": "c/ccsindiatv"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/ccsindia/",
+          "handle": "ccsindia"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/ccsindia",
+          "handle": "company/ccsindia"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 19,
+      "name": "Centre for Development Studies",
+      "website": "https://cds.edu",
+      "final_url": "https://cds.edu/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/cdskeral",
+          "handle": "cdskeral"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/CdsTrivandrum",
+          "handle": "CdsTrivandrum"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/in/cds-centre-for-development-studies-a69046323",
+          "handle": "in/cds-centre-for-development-studies-a69046323"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 20,
+      "name": "Centre for Gender and Politics",
+      "website": "https://www.cgaps.org",
+      "final_url": "https://www.cgaps.org/",
+      "method": "fetch",
+      "links": [],
+      "error": ""
+    },
+    {
+      "id": 21,
+      "name": "Centre for Land Warfare Studies (CLAWS)",
+      "website": "https://www.claws.in",
+      "final_url": "",
+      "method": "",
+      "links": [],
+      "error": "fetch failed; page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.claws.in/\nCall log:\n\u001b[2m  - navigating to \"https://www.claws.in/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+    },
+    {
+      "id": 22,
+      "name": "Centre for Policy Research",
+      "website": "https://cprindia.org",
+      "final_url": "https://cprindia.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/CentreforPolicyResearch/",
+          "handle": "CentreforPolicyResearch"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UCT0LvSYjYr2gmUDhx7Z3wtw",
+          "handle": "channel/UCT0LvSYjYr2gmUDhx7Z3wtw"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/centre-for-policy-research/",
+          "handle": "company/centre-for-policy-research"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/CPR_India",
+          "handle": "CPR_India"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/cpr_india/?igshid=YmMyMTA2M2Y=",
+          "handle": "cpr_india"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 23,
+      "name": "Centre for Public Policy",
+      "website": "https://www.iimb.ac.in/centres-of-excellence/cpp",
+      "final_url": "https://www.iimb.ac.in/centres-of-excellence/cpp",
+      "method": "fetch",
+      "links": [],
+      "error": ""
+    },
+    {
+      "id": 24,
+      "name": "Centre for Public Policy Research",
+      "website": "https://www.cppr.in",
+      "final_url": "https://www.cppr.in/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/cpprindia",
+          "handle": "cpprindia"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/CPPRIndia",
+          "handle": "CPPRIndia"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/CPPRIndia",
+          "handle": "user/CPPRIndia"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/cpprindia",
+          "handle": "company/cpprindia"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/cpprindia/",
+          "handle": "cpprindia"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 25,
+      "name": "Centre for Social and Economic Progress",
+      "website": "https://csep.org",
+      "final_url": "https://csep.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/csepresearch",
+          "handle": "csepresearch"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/CSEP_Org",
+          "handle": "CSEP_Org"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://in.linkedin.com/company/csep-org",
+          "handle": "company/csep-org"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/@CSEPIndia",
+          "handle": "@CSEPIndia"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 26,
+      "name": "Centre for Study of Science, Technology and Policy",
+      "website": "https://cstep.in",
+      "final_url": "https://cstep.in/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/CSTEP_India",
+          "handle": "CSTEP_India"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UCROj7dD9PqkZj4My5En829A",
+          "handle": "channel/UCROj7dD9PqkZj4My5En829A"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/cstep_ind/",
+          "handle": "cstep_ind"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "http://www.linkedin.com/company/cstep",
+          "handle": "company/cstep"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 27,
+      "name": "Centre for the Study of Developing Societies",
+      "website": "https://www.csds.in",
+      "final_url": "",
+      "method": "",
+      "links": [],
+      "error": "fetch failed; page.goto: net::ERR_TIMED_OUT at https://www.csds.in/\nCall log:\n\u001b[2m  - navigating to \"https://www.csds.in/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+    },
+    {
+      "id": 28,
+      "name": "CEPA (Center for European Policy Analysis)",
+      "website": "https://cepa.org",
+      "final_url": "https://cepa.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/cepa",
+          "handle": "cepa"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/center-for-european-policy-analysis",
+          "handle": "company/center-for-european-policy-analysis"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/cepaorg/",
+          "handle": "cepaorg"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/CenterforEuropeanPolicyAnalysis/",
+          "handle": "CenterforEuropeanPolicyAnalysis"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UCiYaHwnU8S_pXYFDLM6RXGw",
+          "handle": "channel/UCiYaHwnU8S_pXYFDLM6RXGw"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 29,
+      "name": "CEPR (Center for Economic and Policy Research)",
+      "website": "https://cepr.net",
+      "final_url": "https://cepr.net/",
+      "method": "playwright",
+      "links": [
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/embed/YSpIaggK2j0",
+          "handle": "embed"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/ceprdc",
+          "handle": "ceprdc"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://facebook.com/ceprDC",
+          "handle": "ceprDC"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/ceprdc/",
+          "handle": "ceprdc"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/center-for-economic-and-policy-research/",
+          "handle": "company/center-for-economic-and-policy-research"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 30,
+      "name": "CEPS (Centre for European Policy Studies)",
+      "website": "https://www.ceps.eu",
+      "final_url": "https://www.ceps.eu/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UCBX-oXE3mC8LGnrRIhCRI7A",
+          "handle": "channel/UCBX-oXE3mC8LGnrRIhCRI7A"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/ceps",
+          "handle": "company/ceps"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/CEPS_thinktank",
+          "handle": "CEPS_thinktank"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 31,
+      "name": "CFR (Council on Foreign Relations)",
+      "website": "https://www.cfr.org",
+      "final_url": "https://www.cfr.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/councilonforeignrelations/",
+          "handle": "councilonforeignrelations"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/council-on-foreign-relations",
+          "handle": "company/council-on-foreign-relations"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/cfr",
+          "handle": "cfr"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/cfr_org",
+          "handle": "cfr_org"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/CFR_org",
+          "handle": "CFR_org"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 32,
+      "name": "Chatham House",
+      "website": "https://www.chathamhouse.org",
+      "final_url": "https://www.chathamhouse.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/ChathamHouse",
+          "handle": "ChathamHouse"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/ChathamHouse",
+          "handle": "ChathamHouse"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/chathamhouse_org/",
+          "handle": "chathamhouse_org"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/ChathamHouse10",
+          "handle": "user/ChathamHouse10"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/473772",
+          "handle": "company/473772"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 33,
+      "name": "Chennai Centre for China Studies",
+      "website": "https://www.c3sindia.org",
+      "final_url": "https://www.c3sindia.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/c3s.10",
+          "handle": "c3s.10"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/c3sindia",
+          "handle": "c3sindia"
+        },
+        {
+          "platform": "X",
+          "url": "https://www.twitter.com/c3schennai",
+          "handle": "c3schennai"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/in/c3s-chennai-centre-for-china-studies-9aa224171/",
+          "handle": "in/c3s-chennai-centre-for-china-studies-9aa224171"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UCGD84-2OKUfrbkOHqssBstw",
+          "handle": "channel/UCGD84-2OKUfrbkOHqssBstw"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 34,
+      "name": "Climate Policy Initiative",
+      "website": "https://www.climatepolicyinitiative.org",
+      "final_url": "https://www.climatepolicyinitiative.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/climatepolicy/",
+          "handle": "climatepolicy"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/1647140/admin/",
+          "handle": "company/1647140"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/c/ClimatePolicyInitiativeOrg",
+          "handle": "c/ClimatePolicyInitiativeOrg"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/climate.policy/",
+          "handle": "climate.policy"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 35,
+      "name": "Council on Energy, Environment and Water",
+      "website": "https://www.ceew.in",
+      "final_url": "https://www.ceew.in/",
+      "method": "playwright",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/CEEWIndia/",
+          "handle": "CEEWIndia"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/CEEWIndia",
+          "handle": "CEEWIndia"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/council-on-energy-environment-and-water/",
+          "handle": "company/council-on-energy-environment-and-water"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UCNF-vGnm1jdA_jhrIpk84Tg",
+          "handle": "channel/UCNF-vGnm1jdA_jhrIpk84Tg"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/ceewindia/",
+          "handle": "ceewindia"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 36,
+      "name": "CSIS (Center for Strategic and International Studies)",
+      "website": "https://www.csis.org",
+      "final_url": "https://www.csis.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/CSIS.org",
+          "handle": "CSIS.org"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/csis",
+          "handle": "csis"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/csis",
+          "handle": "company/csis"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/csisdc",
+          "handle": "user/csisdc"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/csis/",
+          "handle": "csis"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 37,
+      "name": "CUTS International",
+      "website": "https://cuts-international.org",
+      "final_url": "https://cuts-international.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/cutsjaipur/",
+          "handle": "cutsjaipur"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/cutsint/",
+          "handle": "cutsint"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/cuts-international/",
+          "handle": "company/cuts-international"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UCMAhUM4KWSlLdT45TnuXSXg?view_as=subscriber",
+          "handle": "channel/UCMAhUM4KWSlLdT45TnuXSXg"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/CUTS_Inter",
+          "handle": "CUTS_Inter"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 38,
+      "name": "Delhi Policy Group",
+      "website": "https://www.delhipolicygroup.org",
+      "final_url": "https://www.delhipolicygroup.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/DelhiPolicyGroup/",
+          "handle": "DelhiPolicyGroup"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/@DPG_ORG",
+          "handle": "@DPG_ORG"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/dpg_org/",
+          "handle": "dpg_org"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/delhi-policy-group",
+          "handle": "company/delhi-policy-group"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/@dpg_org",
+          "handle": "@dpg_org"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 39,
+      "name": "Development Alternatives",
+      "website": "https://www.devalt.org",
+      "final_url": "https://devalt.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/DAperspectives",
+          "handle": "DAperspectives"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/DevaltOfficial/",
+          "handle": "DevaltOfficial"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/development-alternatives/",
+          "handle": "company/development-alternatives"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/DevaltDelhi",
+          "handle": "user/DevaltDelhi"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/developmentalternatives/?hl=en",
+          "handle": "developmentalternatives"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 40,
+      "name": "DIIS (Danish Institute for International Studies)",
+      "website": "https://www.diis.dk/en",
+      "final_url": "https://www.diis.dk/en",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/danish-institute-for-international-studies/",
+          "handle": "company/danish-institute-for-international-studies"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/@DIISpublish",
+          "handle": "@DIISpublish"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 41,
+      "name": "East Asia Institute",
+      "website": "https://www.eai.or.kr/main/english/",
+      "final_url": "https://www.eai.or.kr/main/english/",
+      "method": "playwright",
+      "links": [],
+      "error": ""
+    },
+    {
+      "id": 42,
+      "name": "ECFR",
+      "website": "https://ecfr.eu",
+      "final_url": "https://ecfr.eu/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/european-council-on-foreign-relations",
+          "handle": "company/european-council-on-foreign-relations"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/ecfr",
+          "handle": "ecfr"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/ecfr.eu/",
+          "handle": "ecfr.eu"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/@ECFRTV",
+          "handle": "@ECFRTV"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 43,
+      "name": "Foreign Policy Research Institute",
+      "website": "https://www.fpri.org",
+      "final_url": "https://www.fpri.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/FPRInews/",
+          "handle": "FPRInews"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/fpri/",
+          "handle": "fpri"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/foreign-policy-research-institute/",
+          "handle": "company/foreign-policy-research-institute"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://youtube.com/channel/UCYB1ercr0h50goIy2yEMvIA",
+          "handle": "channel/UCYB1ercr0h50goIy2yEMvIA"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 44,
+      "name": "Foundation for Defense of Democracies",
+      "website": "https://www.fdd.org",
+      "final_url": "https://www.fdd.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/fdd",
+          "handle": "fdd"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/followFDD/",
+          "handle": "followFDD"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/c/FoundationforDefenseofDemocracies-FDD/videos?view_as=subscriber",
+          "handle": "c/FoundationforDefenseofDemocracies-FDD"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/foundation-for-defense-of-democracies/",
+          "handle": "company/foundation-for-defense-of-democracies"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/fdd_org/?",
+          "handle": "fdd_org"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 45,
+      "name": "Gateway House: Indian Council on Global Relations",
+      "website": "https://www.gatewayhouse.in",
+      "final_url": "https://www.gatewayhouse.in/",
+      "method": "playwright",
+      "links": [
+        {
+          "platform": "X",
+          "url": "http://x.com/gatewayhouseind",
+          "handle": "gatewayhouseind"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/gateway-house-indian-council-of-global-relations",
+          "handle": "company/gateway-house-indian-council-of-global-relations"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/gatewayhouse.in/",
+          "handle": "gatewayhouse.in"
+        },
+        {
+          "platform": "Facebook",
+          "url": "http://www.facebook.com/home.php?",
+          "handle": "home.php"
+        },
+        {
+          "platform": "YouTube",
+          "url": "http://www.youtube.com/channel/UCRIjNjS_T48odMrxTylxIxg",
+          "handle": "channel/UCRIjNjS_T48odMrxTylxIxg"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 46,
+      "name": "Heritage Foundation",
+      "website": "https://www.heritage.org",
+      "final_url": "https://www.heritage.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/heritage",
+          "handle": "heritage"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/heritagefoundation",
+          "handle": "heritagefoundation"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/heritagefoundation",
+          "handle": "heritagefoundation"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/the-heritage-foundation",
+          "handle": "company/the-heritage-foundation"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/HeritageFoundation",
+          "handle": "user/HeritageFoundation"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 47,
+      "name": "Hoover Institution",
+      "website": "https://www.hoover.org",
+      "final_url": "https://www.hoover.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/AmyZegart",
+          "handle": "AmyZegart"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/HooverInstitution",
+          "handle": "user/HooverInstitution"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/HooverInstStanford/",
+          "handle": "HooverInstStanford"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/hooverinstitution/",
+          "handle": "hooverinstitution"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/hoover-institution-at-stanford-university",
+          "handle": "company/hoover-institution-at-stanford-university"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 48,
+      "name": "Hudson Institute",
+      "website": "https://www.hudson.org",
+      "final_url": "https://www.hudson.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/HudsonInstitute",
+          "handle": "HudsonInstitute"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/hudsoninstitute",
+          "handle": "hudsoninstitute"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/hudsoninstitute",
+          "handle": "hudsoninstitute"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/hudsoninstitute",
+          "handle": "user/hudsoninstitute"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 49,
+      "name": "IAI (Istituto Affari Internazionali)",
+      "website": "https://www.iai.it/en",
+      "final_url": "https://www.iai.it/en",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "http://www.facebook.com/IAIonline",
+          "handle": "IAIonline"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/iai.insta",
+          "handle": "iai.insta"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/istituto-affari-internazionali",
+          "handle": "company/istituto-affari-internazionali"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/IAIonline",
+          "handle": "IAIonline"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/IAIChannel",
+          "handle": "user/IAIChannel"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 50,
+      "name": "Ifri (Institut français des relations internationales)",
+      "website": "https://www.ifri.org/en",
+      "final_url": "https://www.ifri.org/en",
+      "method": "playwright",
+      "links": [],
+      "error": ""
+    },
+    {
+      "id": 51,
+      "name": "IISD (International Institute for Sustainable Development)",
+      "website": "https://www.iisd.org",
+      "final_url": "https://www.iisd.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://ca.linkedin.com/company/international-institute-for-sustainable-development",
+          "handle": "company/international-institute-for-sustainable-development"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/iisdvideo",
+          "handle": "user/iisdvideo"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/iisd_news",
+          "handle": "iisd_news"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 52,
+      "name": "IISS (International Institute for Strategic Studies)",
+      "website": "https://www.iiss.org",
+      "final_url": "https://www.iiss.org/",
+      "method": "fetch",
+      "links": [],
+      "error": ""
+    },
+    {
+      "id": 53,
+      "name": "India Foundation",
+      "website": "https://indiafoundation.in",
+      "final_url": "https://indiafoundation.in/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/IndiaFoundation/",
+          "handle": "IndiaFoundation"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/indiafoundation/",
+          "handle": "indiafoundation"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/indfoundation",
+          "handle": "indfoundation"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UCoa562Q8QrgTAAyqNsx36oA",
+          "handle": "channel/UCoa562Q8QrgTAAyqNsx36oA"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://in.linkedin.com/company/india-foundation-delhi",
+          "handle": "company/india-foundation-delhi"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 54,
+      "name": "India Think Council",
+      "website": "https://www.indiathink.org",
+      "final_url": "https://www.indiathink.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/IndiaThink/",
+          "handle": "IndiaThink"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/ITC_SaurabhP",
+          "handle": "ITC_SaurabhP"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UCA17X1xjY8MVFHwVyoNqYdg/videos",
+          "handle": "channel/UCA17X1xjY8MVFHwVyoNqYdg"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/india-think-council/",
+          "handle": "company/india-think-council"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 55,
+      "name": "Indian Council for Research on International Economic Relations",
+      "website": "https://icrier.org",
+      "final_url": "https://icrier.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/icrier",
+          "handle": "icrier"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://linkedin.com/company/icrier",
+          "handle": "company/icrier"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/icrier/",
+          "handle": "icrier"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/ICRIER/",
+          "handle": "ICRIER"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/icrier.res.in/",
+          "handle": "icrier.res.in"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 56,
+      "name": "Indian Council of World Affairs",
+      "website": "https://www.icwa.in",
+      "final_url": "https://www.icwa.in/",
+      "method": "playwright",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/Sapru.House",
+          "handle": "Sapru.House"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/ICWA_NewDelhi",
+          "handle": "ICWA_NewDelhi"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UC0D1OMKLR5eVNIGJ01qKmXg",
+          "handle": "channel/UC0D1OMKLR5eVNIGJ01qKmXg"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/indian-council-of-world-affairs1/",
+          "handle": "company/indian-council-of-world-affairs1"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 57,
+      "name": "Indira Gandhi Institute of Development Research",
+      "website": "https://www.igidr.ac.in",
+      "final_url": "",
+      "method": "",
+      "links": [],
+      "error": "fetch failed; page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.igidr.ac.in/\nCall log:\n\u001b[2m  - navigating to \"https://www.igidr.ac.in/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+    },
+    {
+      "id": 58,
+      "name": "Institute for the Study of War",
+      "website": "https://www.understandingwar.org",
+      "final_url": "https://understandingwar.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/institute-for-the-study-of-war/",
+          "handle": "company/institute-for-the-study-of-war"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/UnderstandingWarOrg",
+          "handle": "user/UnderstandingWarOrg"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/thestudyofwar/?hl=en",
+          "handle": "thestudyofwar"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/InstitutefortheStudyofWar",
+          "handle": "InstitutefortheStudyofWar"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/thestudyofwar",
+          "handle": "thestudyofwar"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 59,
+      "name": "Institute of Economic Growth",
+      "website": "https://www.iegindia.org",
+      "final_url": "https://iegindia.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/InstituteofEconomicGrowth",
+          "handle": "InstituteofEconomicGrowth"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/iegresearch",
+          "handle": "iegresearch"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/institute-of-economics-growth/?originalSubdomain=in",
+          "handle": "company/institute-of-economics-growth"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://youtube.com/live/7jmE-kTY0uo?feature=share",
+          "handle": "live"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 60,
+      "name": "Institute of Peace and Conflict Studies",
+      "website": "https://www.ipcs.org",
+      "final_url": "https://www.ipcs.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/IPCSNewDelhi",
+          "handle": "IPCSNewDelhi"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/ipcsnewdelhi/",
+          "handle": "ipcsnewdelhi"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 61,
+      "name": "Integrated Research and Action for Development",
+      "website": "https://irade.org",
+      "final_url": "https://irade.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/IRADeNewDelhi",
+          "handle": "IRADeNewDelhi"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/IRADe_Delhi",
+          "handle": "IRADe_Delhi"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/integrated-research-for-action-development-irade-/",
+          "handle": "company/integrated-research-for-action-development-irade-"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 62,
+      "name": "International Crisis Group",
+      "website": "https://www.crisisgroup.org",
+      "final_url": "https://www.crisisgroup.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/crisisgroup",
+          "handle": "crisisgroup"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/crisisgroup",
+          "handle": "crisisgroup"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/international-crisis-group",
+          "handle": "company/international-crisis-group"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/CrisisGroup",
+          "handle": "CrisisGroup"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/crisisgroup",
+          "handle": "user/crisisgroup"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 63,
+      "name": "International Republican Institute",
+      "website": "https://www.iri.org",
+      "final_url": "https://www.iri.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "http://www.facebook.com/InternationalRepublicanInstitute",
+          "handle": "InternationalRepublicanInstitute"
+        },
+        {
+          "platform": "X",
+          "url": "http://x.com/IRIglobal",
+          "handle": "IRIglobal"
+        },
+        {
+          "platform": "YouTube",
+          "url": "http://www.youtube.com/user/iritv",
+          "handle": "user/iritv"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "http://www.linkedin.com/company/international-republican-institute",
+          "handle": "company/international-republican-institute"
+        },
+        {
+          "platform": "Instagram",
+          "url": "http://instagram.com/IRIglobal",
+          "handle": "IRIglobal"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 64,
+      "name": "ISPI (Italian Institute for International Political Studies)",
+      "website": "https://www.ispionline.it/en",
+      "final_url": "https://www.ispionline.it/en",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/ISPIonline",
+          "handle": "ISPIonline"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/ispionline",
+          "handle": "ispionline"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/ispigram/",
+          "handle": "ispigram"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/ispi/",
+          "handle": "company/ispi"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UCAFKK8R_81qUvhPdjF-52nA",
+          "handle": "channel/UCAFKK8R_81qUvhPdjF-52nA"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 65,
+      "name": "ISS Africa (Institute for Security Studies)",
+      "website": "https://issafrica.org",
+      "final_url": "https://issafrica.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/institute-for-security-studies",
+          "handle": "company/institute-for-security-studies"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/issafrica",
+          "handle": "issafrica"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/issafrica",
+          "handle": "issafrica"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/ISSAfricaTV",
+          "handle": "ISSAfricaTV"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 66,
+      "name": "ITIF (Information Technology and Innovation Foundation)",
+      "website": "https://itif.org",
+      "final_url": "https://itif.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/ITIFdc",
+          "handle": "ITIFdc"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/itifdc/",
+          "handle": "itifdc"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/innovationpolicy",
+          "handle": "innovationpolicy"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/information-technology-and-innovation-foundation/",
+          "handle": "company/information-technology-and-innovation-foundation"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/@itif",
+          "handle": "@itif"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 67,
+      "name": "Japan Institute of International Affairs (JIIA)",
+      "website": "https://www.jiia.or.jp/en/",
+      "final_url": "https://www.jiia.or.jp/eng/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/JIIA_jpn",
+          "handle": "JIIA_jpn"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UC0_Tol0rF9jExOfGHR7tCPA",
+          "handle": "channel/UC0_Tol0rF9jExOfGHR7tCPA"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/JIIAj",
+          "handle": "JIIAj"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 68,
+      "name": "Konrad Adenauer Foundation",
+      "website": "https://www.kas.de/en",
+      "final_url": "https://www.kas.de/en",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/kasfb",
+          "handle": "kasfb"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/KASonline",
+          "handle": "KASonline"
+        },
+        {
+          "platform": "YouTube",
+          "url": "http://www.youtube.com/c/onlinekas",
+          "handle": "c/onlinekas"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/onlinekas/",
+          "handle": "onlinekas"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://de.linkedin.com/company/konrad-adenauer-stiftung",
+          "handle": "company/konrad-adenauer-stiftung"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 69,
+      "name": "Lowy Institute",
+      "website": "https://www.lowyinstitute.org",
+      "final_url": "https://www.lowyinstitute.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://au.linkedin.com/company/the-lowy-institute-for-international-policy",
+          "handle": "company/the-lowy-institute-for-international-policy"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/LowyInstitute",
+          "handle": "user/LowyInstitute"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/lowyinstitute/?hl=en",
+          "handle": "lowyinstitute"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/LowyInstitute",
+          "handle": "LowyInstitute"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 70,
+      "name": "Manohar Parrikar Institute for Defence Studies and Analyses",
+      "website": "https://www.idsa.in",
+      "final_url": "https://idsa.in/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/InstituteforDefenceStudiesAnalyses",
+          "handle": "InstituteforDefenceStudiesAnalyses"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/IDSAIndia",
+          "handle": "IDSAIndia"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/idsaindia",
+          "handle": "idsaindia"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/mpidsa_india/",
+          "handle": "mpidsa_india"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 71,
+      "name": "Middle East Institute",
+      "website": "https://www.mei.edu",
+      "final_url": "https://www.mei.edu/",
+      "method": "playwright",
+      "links": [],
+      "error": ""
+    },
+    {
+      "id": 72,
+      "name": "Migration Policy Institute",
+      "website": "https://www.migrationpolicy.org",
+      "final_url": "https://www.migrationpolicy.org/",
+      "method": "playwright",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/migration-policy-institute",
+          "handle": "company/migration-policy-institute"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/MigrationPolicy?lang=en",
+          "handle": "MigrationPolicy"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/migrationpolicyinstitute/",
+          "handle": "migrationpolicyinstitute"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/MigrationPolicy",
+          "handle": "user/MigrationPolicy"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/MigrationPolicyInstitute/",
+          "handle": "MigrationPolicyInstitute"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 73,
+      "name": "National Bureau of Asian Research",
+      "website": "https://www.nbr.org",
+      "final_url": "https://www.nbr.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/NBRnews/",
+          "handle": "NBRnews"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/nbrnews",
+          "handle": "nbrnews"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/the-national-bureau-of-asian-research/",
+          "handle": "company/the-national-bureau-of-asian-research"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/NBRonline",
+          "handle": "user/NBRonline"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 74,
+      "name": "National Council of Applied Economic Research",
+      "website": "https://www.ncaer.org",
+      "final_url": "https://ncaer.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/NCAER",
+          "handle": "NCAER"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/ncaer",
+          "handle": "company/ncaer"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/NCAER",
+          "handle": "user/NCAER"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 75,
+      "name": "National Institute of Advanced Studies",
+      "website": "https://www.nias.res.in",
+      "final_url": "https://www.nias.res.in/",
+      "method": "fetch",
+      "links": [],
+      "error": ""
+    },
+    {
+      "id": 76,
+      "name": "New America",
+      "website": "https://www.newamerica.org",
+      "final_url": "https://www.newamerica.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/new-america",
+          "handle": "company/new-america"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/newamericaorg/",
+          "handle": "newamericaorg"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://youtube.com/@NewamericaOrgideas",
+          "handle": "@NewamericaOrgideas"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/NewAmerica",
+          "handle": "NewAmerica"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/NewAmerica",
+          "handle": "NewAmerica"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 77,
+      "name": "NUPI (Norwegian Institute of International Affairs)",
+      "website": "https://www.nupi.no/en",
+      "final_url": "https://www.nupi.no/en",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/nupinytt/",
+          "handle": "nupinytt"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/nupinytt",
+          "handle": "nupinytt"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/nupinytt",
+          "handle": "user/nupinytt"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://no.linkedin.com/company/norwegian-institute-of-international-affairs",
+          "handle": "company/norwegian-institute-of-international-affairs"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 78,
+      "name": "Observer Research Foundation",
+      "website": "https://www.orfonline.org",
+      "final_url": "https://www.orfonline.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/ORFOnline",
+          "handle": "ORFOnline"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/orfonline",
+          "handle": "orfonline"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/observer-research-foundation",
+          "handle": "company/observer-research-foundation"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UCkcjGxTW_mLZmmEfWP2UMtQ",
+          "handle": "channel/UCkcjGxTW_mLZmmEfWP2UMtQ"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/orfonline/",
+          "handle": "orfonline"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 79,
+      "name": "OIIP (Austrian Institute for International Affairs)",
+      "website": "https://www.oiip.ac.at/en/",
+      "final_url": "https://www.oiip.ac.at/en/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/in/%C3%B6sterreichisches-institut-f%C3%BCr-internationale-politik-611010216/",
+          "handle": "in/%C3%B6sterreichisches-institut-f%C3%BCr-internationale-politik-611010216"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/InfoOiip",
+          "handle": "InfoOiip"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UCv1DPI5lm0tN_PXi9m578Gw",
+          "handle": "channel/UCv1DPI5lm0tN_PXi9m578Gw"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/wien.oiip/",
+          "handle": "wien.oiip"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 80,
+      "name": "OSW (Centre for Eastern Studies)",
+      "website": "https://www.osw.waw.pl/en",
+      "final_url": "https://www.osw.waw.pl/en",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/OSW_eng",
+          "handle": "OSW_eng"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/CentreforEasternStudies",
+          "handle": "CentreforEasternStudies"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/centre-for-eastern-studies-osw-",
+          "handle": "company/centre-for-eastern-studies-osw-"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://youtu.be/v-gobZaVUzY",
+          "handle": "v-gobZaVUzY"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 81,
+      "name": "PCNS (Policy Center for the New South)",
+      "website": "https://www.policycenter.ma",
+      "final_url": "https://www.policycenter.ma/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/PolicyCenterNS",
+          "handle": "PolicyCenterNS"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://web.facebook.com/PolicyCenterNS",
+          "handle": "PolicyCenterNS"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/policycenterns/",
+          "handle": "company/policycenterns"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/PolicyCenterfortheNewSouth",
+          "handle": "PolicyCenterfortheNewSouth"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/policycenter.ns/",
+          "handle": "policycenter.ns"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 82,
+      "name": "PIIE",
+      "website": "https://www.piie.com",
+      "final_url": "https://www.piie.com/",
+      "method": "playwright",
+      "links": [],
+      "error": ""
+    },
+    {
+      "id": 83,
+      "name": "Public Affairs Centre (PAC)",
+      "website": "https://pacindia.org",
+      "final_url": "https://www.pacindia.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://in.linkedin.com/company/pacindia",
+          "handle": "company/pacindia"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://instagram.com/pacindia",
+          "handle": "pacindia"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/pacindia",
+          "handle": "pacindia"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://youtube.com/pacindiavideos",
+          "handle": "pacindiavideos"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 84,
+      "name": "RAND Corporation",
+      "website": "https://www.rand.org",
+      "final_url": "https://www.rand.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/rand-corporation",
+          "handle": "company/rand-corporation"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/RANDCorporation/",
+          "handle": "RANDCorporation"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/randcorporation/",
+          "handle": "randcorporation"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/RANDCorporation",
+          "handle": "RANDCorporation"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/TheRANDCorporation",
+          "handle": "user/TheRANDCorporation"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 85,
+      "name": "RIS",
+      "website": "https://www.ris.org.in",
+      "final_url": "https://www.ris.org.in/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/RIS_NewDelhi",
+          "handle": "RIS_NewDelhi"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/RISIndia",
+          "handle": "RISIndia"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/research-and-information-system-for-developing-countries",
+          "handle": "company/research-and-information-system-for-developing-countries"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/RISNewDelhi/videos?view_as=subscriber/",
+          "handle": "user/RISNewDelhi"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/risdelhi/",
+          "handle": "risdelhi"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 86,
+      "name": "SAIIA (South African Institute of International Affairs)",
+      "website": "https://saiia.org.za",
+      "final_url": "https://saiia.org.za/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "http://x.com/SAIIA_info",
+          "handle": "SAIIA_info"
+        },
+        {
+          "platform": "YouTube",
+          "url": "http://www.youtube.com/saiiaclips",
+          "handle": "saiiaclips"
+        },
+        {
+          "platform": "Instagram",
+          "url": "http://instagram.com/saiia_org/",
+          "handle": "saiia_org"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "http://www.linkedin.com/company/1121142",
+          "handle": "company/1121142"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 87,
+      "name": "SIPRI (Stockholm International Peace Research Institute)",
+      "website": "https://www.sipri.org",
+      "final_url": "https://www.sipri.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "http://www.facebook.com/sipri.org",
+          "handle": "sipri.org"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/sipriorg/",
+          "handle": "sipriorg"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/SIPRIorg",
+          "handle": "SIPRIorg"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/sipri",
+          "handle": "company/sipri"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/SIPRIorg",
+          "handle": "user/SIPRIorg"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 88,
+      "name": "Stimson Centre",
+      "website": "https://www.stimson.org",
+      "final_url": "https://www.stimson.org/",
+      "method": "playwright",
+      "links": [
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/@TheStimsonCenter",
+          "handle": "@TheStimsonCenter"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 89,
+      "name": "SWP (German Institute for International and Security Affairs)",
+      "website": "https://www.swp-berlin.org/en",
+      "final_url": "https://www.swp-berlin.org/en",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/swp-berlin",
+          "handle": "company/swp-berlin"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/@SWP-Berlin",
+          "handle": "@SWP-Berlin"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 90,
+      "name": "Tax Foundation",
+      "website": "https://taxfoundation.org",
+      "final_url": "https://taxfoundation.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/taxfoundation",
+          "handle": "taxfoundation"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/taxfoundation",
+          "handle": "taxfoundation"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "http://www.linkedin.com/company/tax-foundation",
+          "handle": "company/tax-foundation"
+        },
+        {
+          "platform": "YouTube",
+          "url": "http://www.youtube.com/user/TaxFoundation",
+          "handle": "user/TaxFoundation"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/tax.foundation/",
+          "handle": "tax.foundation"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 91,
+      "name": "The Energy and Resources Institute",
+      "website": "https://www.teriin.org",
+      "final_url": "https://www.teriin.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/TERIIN/",
+          "handle": "TERIIN"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/teriin",
+          "handle": "teriin"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/user/teri",
+          "handle": "user/teri"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/teriindia/",
+          "handle": "teriindia"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/teriin/",
+          "handle": "company/teriin"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 92,
+      "name": "The Takshashila Institution",
+      "website": "https://takshashila.org.in",
+      "final_url": "https://takshashila.org.in/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "X",
+          "url": "https://x.com/TakshashilaInst",
+          "handle": "TakshashilaInst"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/school/the-takshashila-institution/mycompany",
+          "handle": "school/the-takshashila-institution"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/takshashilainst/",
+          "handle": "takshashilainst"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/c/TakshashilaInst",
+          "handle": "c/TakshashilaInst"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "id": 93,
+      "name": "Urban Institute",
+      "website": "https://www.urban.org",
+      "final_url": "https://www.urban.org/",
+      "method": "playwright",
+      "links": [],
+      "error": ""
+    },
+    {
+      "id": 94,
+      "name": "Washington Institute for Near East Policy",
+      "website": "https://www.washingtoninstitute.org",
+      "final_url": "https://www.washingtoninstitute.org/",
+      "method": "fetch",
+      "links": [
+        {
+          "platform": "Facebook",
+          "url": "http://www.facebook.com/WashingtonInstitute",
+          "handle": "WashingtonInstitute"
+        },
+        {
+          "platform": "X",
+          "url": "https://x.com/WashInstitute",
+          "handle": "WashInstitute"
+        },
+        {
+          "platform": "YouTube",
+          "url": "http://www.youtube.com/user/WashingtonInstitute",
+          "handle": "user/WashingtonInstitute"
+        },
+        {
+          "platform": "LinkedIn",
+          "url": "https://www.linkedin.com/company/the-washington-institute-for-near-east-policy",
+          "handle": "company/the-washington-institute-for-near-east-policy"
+        }
+      ],
+      "error": ""
+    }
+  ]
+}

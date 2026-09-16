@@ -1,0 +1,40 @@
+[
+  {
+    "run_id": "2026-09-16_08-33-18-167",
+    "id": "x-openai",
+    "name": "OpenAI",
+    "website": "https://openai.com",
+    "platform": "X",
+    "handle": "OpenAI",
+    "profile_url": "https://x.com/OpenAI",
+    "metric_label": "Followers",
+    "count": 5338607,
+    "raw_display_text": "5338607",
+    "count_precision": "exact_public",
+    "status": "collected",
+    "error": "",
+    "source_url": "https://x.com/OpenAI",
+    "captured_at": "2026-09-16T08:33:18.172Z",
+    "fetch_method": "static",
+    "notes": "Seed public profile"
+  },
+  {
+    "run_id": "2026-09-16_08-33-18-167",
+    "id": "x-google",
+    "name": "Google",
+    "website": "https://www.google.com",
+    "platform": "X",
+    "handle": "Google",
+    "profile_url": "https://x.com/Google",
+    "metric_label": "Followers",
+    "count": 31896078,
+    "raw_display_text": "31896078",
+    "count_precision": "exact_public",
+    "status": "collected",
+    "error": "",
+    "source_url": "https://x.com/Google",
+    "captured_at": "2026-09-16T08:33:20.556Z",
+    "fetch_method": "static",
+    "notes": "Seed public profile"
+  }
+]

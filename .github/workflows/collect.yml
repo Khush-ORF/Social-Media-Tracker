@@ -1,0 +1,50 @@
+name: Collect Follower Counts
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "Optional platform: YouTube, X, LinkedIn, Instagram, Facebook"
+        required: false
+        default: ""
+  schedule:
+    - cron: "30 18 28-31 * *"
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: sudo apt-get update && sudo apt-get install -y sqlite3
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Collect selected platform or all on month end
+        shell: bash
+        run: |
+          set -euo pipefail
+          PLATFORM="${{ github.event.inputs.platform || '' }}"
+          if [[ -z "$PLATFORM" && "$(date -u -d tomorrow +%d)" != "01" ]]; then
+            echo "Not the last UTC day of the month; skipping scheduled collection."
+            exit 0
+          fi
+          if [[ -n "$PLATFORM" ]]; then
+            node app/collect.mjs --platform "$PLATFORM"
+          else
+            node app/collect.mjs --all
+          fi
+          npm run build:static
+      - name: Commit collected data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data public/data
+          git diff --cached --quiet && echo "No data changes" || git commit -m "Update follower snapshots"
+          git push

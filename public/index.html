@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Social Follower Tracker</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>Social Follower Tracker</h1>
+      <p id="subtitle">Local public-count snapshots</p>
+    </div>
+    <div class="actions">
+      <select id="runPlatform" aria-label="Run platform">
+        <option value="">All platforms</option>
+        <option>YouTube</option>
+        <option>X</option>
+        <option>LinkedIn</option>
+        <option>Instagram</option>
+        <option>Facebook</option>
+      </select>
+      <button id="runNow">Run fetch now</button>
+      <a class="button ghost" href="/api/download/history_matrix.csv">Matrix CSV</a>
+      <a class="button ghost" href="/api/download/snapshots.csv">Raw CSV</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="stats" id="stats"></section>
+    <section class="run-status" id="runStatus">Idle</section>
+
+    <section class="toolbar">
+      <input id="search" type="search" placeholder="Search accounts">
+      <select id="statusFilter">
+        <option value="">All statuses</option>
+        <option value="collected">Collected</option>
+        <option value="count_not_found">Count not found</option>
+        <option value="failed">Failed</option>
+      </select>
+    </section>
+
+    <section class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Account</th>
+            <th>YouTube</th>
+            <th>X</th>
+            <th>LinkedIn</th>
+            <th>Instagram</th>
+            <th>Facebook</th>
+            <th>Last captured</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody id="latestRows"></tbody>
+      </table>
+    </section>
+
+    <section class="history">
+      <h2>History</h2>
+      <div id="historyRows"></div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
