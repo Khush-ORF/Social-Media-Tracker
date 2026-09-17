@@ -151,37 +151,13 @@ node app/collect.mjs --platform X
 
 For local use, prefer one platform at a time. A full run currently covers hundreds of accounts and can take a while.
 
-## Dashboard Fetch Button
+## Dashboard Collection
 
 The local dashboard has a `Run fetch now` button.
 
 Locally, this starts a background collector job through the local server. The status line shows live progress while the job runs.
 
-On GitHub Pages, the dashboard runs in static mode. A static page cannot safely store a GitHub token, so the button needs a tiny trigger endpoint to start GitHub Actions.
-
-This repo includes a Cloudflare Worker trigger in:
-
-```text
-worker/collect-trigger.js
-```
-
-After deploying that Worker, update:
-
-```text
-public/trigger-config.json
-```
-
-with:
-
-```json
-{
-  "collectEndpoint": "https://your-worker-name.your-subdomain.workers.dev"
-}
-```
-
-Then the website button will trigger the `Collect Follower Counts` GitHub Actions workflow.
-
-If the dropdown is set to `X`, the button starts the X-only workflow job. That job requires the Windows self-hosted runner described below. Without that runner online, GitHub will queue the X job instead of collecting data.
+On GitHub Pages, the dashboard is read-only. The fetch button is disabled online because a static site cannot safely store a GitHub token. Use GitHub Actions to run collection, then the dashboard updates after the generated data is pushed.
 
 ## Data Files
 
@@ -337,7 +313,7 @@ If no platform is supplied, the workflow runs the hosted-safe platform set: YouT
 
 On GitHub-hosted Actions, the default all-platform run excludes X. X blocks GitHub Actions IP ranges too aggressively to be reliable.
 
-To run X online from the website button, configure a GitHub self-hosted runner on a Windows machine. When the workflow input is `X`, `.github/workflows/collect.yml` uses:
+To run X online, configure a GitHub self-hosted runner on a Windows machine. When the workflow input is `X`, `.github/workflows/collect.yml` uses:
 
 ```yaml
 runs-on: [self-hosted, Windows]
@@ -372,7 +348,7 @@ C:\msys64\ucrt64\bin\sqlite3.exe
 
 5. Start the runner and keep it online when you trigger X collection.
 
-After that, from GitHub Actions or from the website button, choose:
+After that, from GitHub Actions, choose:
 
 ```text
 X

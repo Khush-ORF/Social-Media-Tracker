@@ -2,7 +2,6 @@ const state = {
   latest: [],
   snapshots: [],
   staticMode: false,
-  triggerEndpoint: '',
 };
 
 const fmt = new Intl.NumberFormat('en-US');
@@ -133,15 +132,17 @@ async function load() {
   }
   state.latest = latest.rows || [];
   state.snapshots = [];
-  state.triggerEndpoint = await loadTriggerEndpoint();
   el('subtitle').textContent = latest.generated_at
     ? `Latest generated ${latest.generated_at}${state.staticMode ? ' · static GitHub Pages mode' : ''}`
     : 'No snapshots yet';
-  el('runNow').disabled = state.staticMode && !state.triggerEndpoint;
+  el('runNow').disabled = state.staticMode;
+  el('runPlatform').disabled = state.staticMode;
   if (state.staticMode) {
-    el('runStatus').textContent = state.triggerEndpoint
-      ? 'Static mode: button triggers GitHub Actions through the configured trigger endpoint.'
-      : 'Static mode: configure public/trigger-config.json to enable the website fetch button.';
+    el('runNow').textContent = 'Fetch disabled online';
+    el('runStatus').textContent = 'Static viewer: run collection from GitHub Actions. The dashboard updates after new data is pushed.';
+  } else {
+    el('runNow').textContent = 'Run fetch now';
+    el('runPlatform').disabled = false;
   }
   renderStats(state.latest);
   renderLatest();
@@ -160,44 +161,24 @@ async function loadHistoryInBackground() {
   }
 }
 
-async function loadTriggerEndpoint() {
-  try {
-    const response = await fetch('trigger-config.json', { cache: 'no-store' });
-    if (!response.ok) return '';
-    const config = await response.json();
-    return String(config.collectEndpoint || '').trim();
-  } catch {
-    return '';
-  }
-}
-
 async function runNow() {
   const button = el('runNow');
+  if (state.staticMode) {
+    el('runStatus').textContent = 'Online fetch is disabled. Use GitHub Actions to run collection.';
+    return;
+  }
   button.disabled = true;
   button.textContent = 'Starting...';
   try {
     const platform = el('runPlatform').value;
-    const endpoint = state.staticMode ? state.triggerEndpoint : 'api/run';
-    if (!endpoint) throw new Error('No collection endpoint configured for static deployment.');
-    const res = await fetch(endpoint, {
+    const res = await fetch('api/run', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ platform }),
     });
     const payload = await res.json();
     if (!payload.ok) throw new Error(payload.error || 'Fetch failed');
-    if (state.staticMode) {
-      const target = platform === 'X'
-        ? ' for X on the self-hosted runner'
-        : platform
-          ? ` for ${platform}`
-          : ' for hosted-safe platforms excluding X';
-      el('runStatus').textContent = `GitHub Actions collection started${target}. Refresh after the workflow finishes.`;
-      button.disabled = false;
-      button.textContent = 'Run fetch now';
-    } else {
-      await pollRunStatus();
-    }
+    await pollRunStatus();
   } catch (error) {
     alert(error.message);
     button.disabled = false;
