@@ -121,28 +121,18 @@ function escapeAttribute(value) {
 
 async function load() {
   let latest;
-  let snapshots;
   try {
-    [latest, snapshots] = await Promise.all([
-      fetch('api/latest').then(res => {
-        if (!res.ok) throw new Error('API unavailable');
-        return res.json();
-      }),
-      fetch('api/snapshots').then(res => {
-        if (!res.ok) throw new Error('API unavailable');
-        return res.json();
-      }),
-    ]);
+    latest = await fetch('api/latest').then(res => {
+      if (!res.ok) throw new Error('API unavailable');
+      return res.json();
+    });
     state.staticMode = false;
   } catch {
-    [latest, snapshots] = await Promise.all([
-      fetch('data/latest.json').then(res => res.ok ? res.json() : { generated_at: null, rows: [] }),
-      fetch('data/snapshots.json').then(res => res.ok ? res.json() : { rows: [] }),
-    ]);
+    latest = await fetch('data/latest.json').then(res => res.ok ? res.json() : { generated_at: null, rows: [] });
     state.staticMode = true;
   }
   state.latest = latest.rows || [];
-  state.snapshots = snapshots.rows || [];
+  state.snapshots = [];
   state.triggerEndpoint = await loadTriggerEndpoint();
   el('subtitle').textContent = latest.generated_at
     ? `Latest generated ${latest.generated_at}${state.staticMode ? ' · static GitHub Pages mode' : ''}`
@@ -156,6 +146,18 @@ async function load() {
   renderStats(state.latest);
   renderLatest();
   renderHistory();
+  loadHistoryInBackground();
+}
+
+async function loadHistoryInBackground() {
+  try {
+    const snapshots = await fetch(state.staticMode ? 'data/snapshots.json' : 'api/snapshots')
+      .then(res => res.ok ? res.json() : { rows: [] });
+    state.snapshots = snapshots.rows || [];
+    renderHistory();
+  } catch {
+    state.snapshots = [];
+  }
 }
 
 async function loadTriggerEndpoint() {
@@ -177,6 +179,9 @@ async function runNow() {
     const platform = el('runPlatform').value;
     const endpoint = state.staticMode ? state.triggerEndpoint : 'api/run';
     if (!endpoint) throw new Error('No collection endpoint configured for static deployment.');
+    if (state.staticMode && platform === 'X') {
+      throw new Error('X collection is disabled on the hosted site because X blocks GitHub Actions IPs. Run X locally and push the data.');
+    }
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -185,7 +190,7 @@ async function runNow() {
     const payload = await res.json();
     if (!payload.ok) throw new Error(payload.error || 'Fetch failed');
     if (state.staticMode) {
-      el('runStatus').textContent = `GitHub Actions collection started${platform ? ` for ${platform}` : ' for all platforms'}. Refresh after the workflow finishes.`;
+      el('runStatus').textContent = `GitHub Actions collection started${platform ? ` for ${platform}` : ' for hosted platforms excluding X'}. Refresh after the workflow finishes.`;
       button.disabled = false;
       button.textContent = 'Run fetch now';
     } else {

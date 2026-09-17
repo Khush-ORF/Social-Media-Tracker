@@ -331,7 +331,17 @@ Instagram
 Facebook
 ```
 
-If no platform is supplied, the workflow runs all platforms.
+If no platform is supplied, the workflow runs the hosted-safe platform set.
+
+On GitHub-hosted Actions, the default all-platform run excludes X. X blocks GitHub Actions IP ranges too aggressively to be reliable. Run X locally with:
+
+```bash
+node app/collect.mjs --platform X
+npm run build:static
+git add data public/data
+git commit -m "Update X follower snapshots"
+git push
+```
 
 The scheduled workflow runs on the 28th-31st but only collects when tomorrow is the first day of a new month. This handles months that do not have a 31st.
 
