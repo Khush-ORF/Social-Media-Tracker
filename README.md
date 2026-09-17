@@ -181,6 +181,8 @@ with:
 
 Then the website button will trigger the `Collect Follower Counts` GitHub Actions workflow.
 
+If the dropdown is set to `X`, the button starts the X-only workflow job. That job requires the Windows self-hosted runner described below. Without that runner online, GitHub will queue the X job instead of collecting data.
+
 ## Data Files
 
 ### Raw History
@@ -331,9 +333,54 @@ Instagram
 Facebook
 ```
 
-If no platform is supplied, the workflow runs the hosted-safe platform set.
+If no platform is supplied, the workflow runs the hosted-safe platform set: YouTube, LinkedIn, Facebook, and Instagram.
 
-On GitHub-hosted Actions, the default all-platform run excludes X. X blocks GitHub Actions IP ranges too aggressively to be reliable. Run X locally with:
+On GitHub-hosted Actions, the default all-platform run excludes X. X blocks GitHub Actions IP ranges too aggressively to be reliable.
+
+To run X online from the website button, configure a GitHub self-hosted runner on a Windows machine. When the workflow input is `X`, `.github/workflows/collect.yml` uses:
+
+```yaml
+runs-on: [self-hosted, Windows]
+```
+
+That means the X job runs from your own machine/network, but it is still triggered online through GitHub Actions.
+
+### Windows Self-Hosted Runner for X
+
+1. Go to:
+
+```text
+GitHub repo -> Settings -> Actions -> Runners -> New self-hosted runner -> Windows x64
+```
+
+2. Follow GitHub's setup commands on the Windows machine that should collect X.
+
+3. Install or verify these tools on that machine:
+
+```powershell
+node --version
+npm --version
+git --version
+sqlite3 --version
+```
+
+4. If `sqlite3` is not in PATH, either add it to PATH or set `SQLITE3_BIN` for the runner service. The app also checks this common MSYS path automatically:
+
+```text
+C:\msys64\ucrt64\bin\sqlite3.exe
+```
+
+5. Start the runner and keep it online when you trigger X collection.
+
+After that, from GitHub Actions or from the website button, choose:
+
+```text
+X
+```
+
+The job will run on your machine, collect X, rebuild the public data, and push the updated dataset back to GitHub Pages.
+
+If you do not configure a self-hosted runner, X runs will stay queued. In that case, run X locally with:
 
 ```bash
 node app/collect.mjs --platform X

@@ -18,7 +18,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  collect:
+  collect-hosted:
+    if: ${{ github.event.inputs.platform != 'X' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,10 +41,6 @@ jobs:
             exit 0
           fi
           if [[ -n "$PLATFORM" ]]; then
-            if [[ "$PLATFORM" == "X" ]]; then
-              echo "X is disabled on GitHub-hosted collection because X blocks GitHub Actions IPs. Run X locally and push the resulting data instead."
-              exit 0
-            fi
             node app/collect.mjs --platform "$PLATFORM"
           else
             echo "Hosted all-platform collection excludes X because X blocks GitHub Actions IPs."
@@ -61,4 +58,51 @@ jobs:
           git pull --rebase origin main
           git add data public/data
           git diff --cached --quiet && echo "No data changes" || git commit -m "Update follower snapshots"
+          git push
+
+  collect-x-self-hosted:
+    if: ${{ github.event.inputs.platform == 'X' }}
+    runs-on: [self-hosted, Windows]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check local tools
+        shell: pwsh
+        run: |
+          node --version
+          npm --version
+          git --version
+          if (Get-Command sqlite3 -ErrorAction SilentlyContinue) {
+            sqlite3 --version
+          } elseif (Test-Path 'C:\msys64\ucrt64\bin\sqlite3.exe') {
+            & 'C:\msys64\ucrt64\bin\sqlite3.exe' --version
+          } else {
+            Write-Warning 'sqlite3 was not found in PATH or C:\msys64\ucrt64\bin. npm run build:static will fail until sqlite3 is installed or SQLITE3_BIN is set.'
+          }
+      - run: npm install
+      - run: npx playwright install chromium
+      - name: Collect X on self-hosted runner
+        shell: pwsh
+        run: |
+          node app/collect.mjs --platform X
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run build:static
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Commit collected X data
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
+          git add data public/data
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 0) {
+            Write-Output "No data changes"
+          } else {
+            git commit -m "Update X follower snapshots"
+          }
           git push

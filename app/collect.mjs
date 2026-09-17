@@ -17,6 +17,8 @@ function sleep(ms) {
 
 function platformDelay(platform) {
   const githubActions = process.env.GITHUB_ACTIONS === 'true';
+  const selfHostedRunner = process.env.RUNNER_ENVIRONMENT === 'self-hosted';
+  if (selfHostedRunner) return 500;
   if (!githubActions) return 500;
   if (platform === 'Instagram') return 12000;
   if (platform === 'X') return 3500;
@@ -91,7 +93,8 @@ async function collectOne(account, runId) {
   };
 
   let firstError = '';
-  const renderedFirst = process.env.GITHUB_ACTIONS === 'true' && ['X', 'Instagram'].includes(account.platform);
+  const selfHostedRunner = process.env.RUNNER_ENVIRONMENT === 'self-hosted';
+  const renderedFirst = process.env.GITHUB_ACTIONS === 'true' && !selfHostedRunner && ['X', 'Instagram'].includes(account.platform);
   const fetchers = renderedFirst ? [fetchRendered, fetchStatic] : [fetchStatic, fetchRendered];
   for (const fetcher of fetchers) {
     try {

@@ -5,6 +5,18 @@ import { ACCOUNTS_FILE, DATA_DIR, ROOT, parseCsv, readSnapshots } from './utils.
 
 const dbPath = path.join(DATA_DIR, 'follower_tracker.sqlite');
 const schemaPath = path.join(ROOT, 'sql', 'schema.sql');
+const windowsSqlitePath = 'C:\\msys64\\ucrt64\\bin\\sqlite3.exe';
+
+async function sqliteCommand() {
+  if (process.env.SQLITE3_BIN) return process.env.SQLITE3_BIN;
+  if (process.platform !== 'win32') return 'sqlite3';
+  try {
+    await fs.access(windowsSqlitePath);
+    return windowsSqlitePath;
+  } catch {
+    return 'sqlite3';
+  }
+}
 
 function sqlString(value) {
   if (value === undefined || value === null || value === '') return 'NULL';
@@ -19,8 +31,9 @@ function sqlInteger(value) {
 
 async function runSql(sql) {
   await fs.mkdir(DATA_DIR, { recursive: true });
+  const command = await sqliteCommand();
   await new Promise((resolve, reject) => {
-    const child = spawn('sqlite3', [dbPath], { cwd: ROOT });
+    const child = spawn(command, [dbPath], { cwd: ROOT });
     let stderr = '';
     child.stderr.on('data', chunk => { stderr += chunk; });
     child.on('error', reject);

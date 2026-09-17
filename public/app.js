@@ -179,9 +179,6 @@ async function runNow() {
     const platform = el('runPlatform').value;
     const endpoint = state.staticMode ? state.triggerEndpoint : 'api/run';
     if (!endpoint) throw new Error('No collection endpoint configured for static deployment.');
-    if (state.staticMode && platform === 'X') {
-      throw new Error('X collection is disabled on the hosted site because X blocks GitHub Actions IPs. Run X locally and push the data.');
-    }
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -190,7 +187,12 @@ async function runNow() {
     const payload = await res.json();
     if (!payload.ok) throw new Error(payload.error || 'Fetch failed');
     if (state.staticMode) {
-      el('runStatus').textContent = `GitHub Actions collection started${platform ? ` for ${platform}` : ' for hosted platforms excluding X'}. Refresh after the workflow finishes.`;
+      const target = platform === 'X'
+        ? ' for X on the self-hosted runner'
+        : platform
+          ? ` for ${platform}`
+          : ' for hosted-safe platforms excluding X';
+      el('runStatus').textContent = `GitHub Actions collection started${target}. Refresh after the workflow finishes.`;
       button.disabled = false;
       button.textContent = 'Run fetch now';
     } else {
