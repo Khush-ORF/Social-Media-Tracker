@@ -2,7 +2,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+export const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+export const ROOT = process.env.TRACKER_DATA_ROOT ? path.resolve(process.env.TRACKER_DATA_ROOT) : APP_ROOT;
 export const ACCOUNTS_FILE = path.join(ROOT, 'accounts.csv');
 export const DATA_DIR = path.join(ROOT, 'data');
 export const RUNS_DIR = path.join(DATA_DIR, 'runs');
@@ -159,7 +160,7 @@ export async function writeRun(runId, rows) {
   await fs.writeFile(path.join(RUNS_DIR, `${runId}.json`), JSON.stringify(rows, null, 2), 'utf8');
 }
 
-export async function writeLatest(allRows, accounts = null) {
+export function buildLatest(allRows, accounts = null) {
   const allowedIds = accounts ? new Set(accounts.map(account => account.id)) : null;
   const latest = new Map();
   for (const row of allRows) {
@@ -168,7 +169,11 @@ export async function writeLatest(allRows, accounts = null) {
     const current = latest.get(key);
     if (!current || String(row.captured_at) > String(current.captured_at)) latest.set(key, row);
   }
-  const rows = [...latest.values()].sort((a, b) => String(a.name).localeCompare(String(b.name)) || String(a.platform).localeCompare(String(b.platform)));
+  return [...latest.values()].sort((a, b) => String(a.name).localeCompare(String(b.name)) || String(a.platform).localeCompare(String(b.platform)));
+}
+
+export async function writeLatest(allRows, accounts = null) {
+  const rows = buildLatest(allRows, accounts);
   await ensureDataDirs();
   await fs.writeFile(LATEST_JSON, JSON.stringify({ generated_at: new Date().toISOString(), rows }, null, 2), 'utf8');
   return rows;

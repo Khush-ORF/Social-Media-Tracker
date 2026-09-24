@@ -41,12 +41,12 @@ jobs:
             exit 0
           fi
           if [[ -n "$PLATFORM" ]]; then
-            node app/collect.mjs --platform "$PLATFORM"
+            node app/collect.mjs --platform "$PLATFORM" --render
           else
             echo "Hosted all-platform collection excludes X because X blocks GitHub Actions IPs."
             for PLATFORM_NAME in YouTube LinkedIn Facebook Instagram; do
               echo "::group::Collect $PLATFORM_NAME"
-              node app/collect.mjs --platform "$PLATFORM_NAME"
+              node app/collect.mjs --platform "$PLATFORM_NAME" --render
               echo "::endgroup::"
             done
           fi
@@ -88,7 +88,7 @@ jobs:
       - name: Collect X on self-hosted runner
         shell: pwsh
         run: |
-          node app/collect.mjs --platform X
+          node app/collect.mjs --platform X --render
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           npm run build:static
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

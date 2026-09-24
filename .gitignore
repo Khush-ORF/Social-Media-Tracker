@@ -4,4 +4,7 @@ tmp/
 outputs/
 sources/
 *.log
+desktop/build/
+desktop/dist/
+desktop/.cache/
 

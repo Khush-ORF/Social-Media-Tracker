@@ -124,6 +124,10 @@ input[type="search"] {
   overflow: hidden;
 }
 
+.table-wrap { overflow-x: auto; }
+.table-wrap table { min-width: 1100px; }
+td { overflow-wrap: anywhere; }
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -163,7 +167,7 @@ td:last-child {
 
 .status {
   display: inline-flex;
-  min-width: 92px;
+  min-width: 0;
   justify-content: center;
   border-radius: 999px;
   padding: 4px 8px;

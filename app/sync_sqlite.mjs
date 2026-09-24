@@ -1,10 +1,10 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { ACCOUNTS_FILE, DATA_DIR, ROOT, parseCsv, readSnapshots } from './utils.mjs';
+import { ACCOUNTS_FILE, APP_ROOT, DATA_DIR, ROOT, parseCsv, readSnapshots } from './utils.mjs';
 
 const dbPath = path.join(DATA_DIR, 'follower_tracker.sqlite');
-const schemaPath = path.join(ROOT, 'sql', 'schema.sql');
+const schemaPath = path.join(APP_ROOT, 'sql', 'schema.sql');
 const windowsSqlitePath = 'C:\\msys64\\ucrt64\\bin\\sqlite3.exe';
 
 async function sqliteCommand() {
@@ -31,6 +31,17 @@ function sqlInteger(value) {
 
 async function runSql(sql) {
   await fs.mkdir(DATA_DIR, { recursive: true });
+  let DatabaseSync;
+  try {
+    ({ DatabaseSync } = await import('node:sqlite'));
+  } catch (error) {
+    if (error.code !== 'ERR_UNKNOWN_BUILTIN_MODULE') throw error;
+  }
+  if (DatabaseSync) {
+    const db = new DatabaseSync(dbPath);
+    try { db.exec(sql); } finally { db.close(); }
+    return;
+  }
   const command = await sqliteCommand();
   await new Promise((resolve, reject) => {
     const child = spawn(command, [dbPath], { cwd: ROOT });

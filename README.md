@@ -12,6 +12,30 @@ This project tracks publicly visible follower/subscriber counts for think tank a
 
 It is designed to run locally and on GitHub for free. The app keeps a historical dataset over time, exposes CSV/JSON exports, stores records in SQLite, and publishes a static dashboard with GitHub Pages.
 
+## Windows Desktop App
+
+Download the Windows x64 `.exe` from [GitHub Releases](https://github.com/Khush-ORF/Social-Media-Tracker/releases). Run it to open the tracker in a desktop window. Node.js, the headless browser, and SQLite support are bundled; no separate installation or subscription is required. Internet access is needed for collection.
+
+The desktop app includes the current account list and historical dataset on its first launch. Check the displayed observation dates and click **Run fetch now** for fresh counts. Select one platform or all platforms, then keep the application open until the run completes. Reloading the view reconnects to collection progress. Missing counts remain missing; the app never substitutes an older value for a failed request.
+
+Use the **File** menu to open the data folder, edit `accounts.csv`, or export either history CSV. On Windows, records normally live under `%APPDATA%/Social Follower Tracker/records`. The **Open data folder** command shows the exact location. Back up that entire folder, including `accounts.csv` and `data/`. Replacing the executable does not overwrite existing records. Each Windows user has their own records. The desktop app uses its own available local port and can run alongside the development server.
+
+The executable is a portable Windows 10/11 x64 application. It extracts its bundled runtime at startup, so the first launch may take a moment. This free release is unsigned; Windows may show an unknown-publisher warning. Release assets include a SHA-256 checksum. There is no desktop background scheduler: collection runs while the app is open. GitHub Actions remains the separate scheduled option.
+
+### Build The Desktop Executable
+
+Use Windows x64 and Node.js 24:
+
+```powershell
+npm install
+npx playwright install --only-shell chromium
+cd desktop
+npm ci
+npm run dist
+```
+
+The standalone executable is written to `desktop/dist/`. Packaging code is in `desktop/`; only the tracker code, dependencies, account list, and historical data are bundled. Research working files are excluded. `npm run pack` produces an unpacked app for testing. The manual **Build Windows Desktop Release** workflow builds, tests, and uploads a release using the version in `desktop/package.json`; increment that version and update the release notes for each new release.
+
 ## What This Does
 
 The tracker uses a manually curated `accounts.csv` containing official or corroborated social media profile URLs. A collector visits each public profile page, extracts the visible follower/subscriber count where available, and appends the result to the historical dataset.
@@ -155,7 +179,11 @@ For local use, prefer one platform at a time. A full run currently covers hundre
 
 The local dashboard has a `Run fetch now` button.
 
-Locally, this starts a background collector job through the local server. The status line shows live progress while the job runs.
+Locally, this starts a fresh collection through the local server with browser rendering enabled and four concurrent requests. The status line shows live progress and reconnects after a page reload. Completed runs update CSV history, SQLite, and the public exports.
+
+The latest table reflects the newest attempt for each account. A failed attempt remains missing; older counts are never substituted. Earlier observations remain available in history. Results appear when the run finishes.
+
+For the same collection behaviour from the terminal, use `node app/collect.mjs --all --render --concurrency 4`. The default CLI fast mode omits browser rendering and may miss counts on pages that require JavaScript.
 
 On GitHub Pages, the dashboard is read-only. The fetch button is disabled online because a static site cannot safely store a GitHub token. Use GitHub Actions to run collection, then the dashboard updates after the generated data is pushed.
 

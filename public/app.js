@@ -5,6 +5,11 @@ const state = {
 };
 
 const fmt = new Intl.NumberFormat('en-US');
+const dateFmt = new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+function displayDate(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '' : dateFmt.format(date);
+}
 const platforms = ['YouTube', 'X', 'LinkedIn', 'Instagram', 'Facebook'];
 
 function el(id) {
@@ -71,7 +76,7 @@ function renderLatest() {
     return `<tr>
       <td><strong>${escapeHtml(account.name)}</strong><div class="muted">${escapeHtml(account.website || '')}</div></td>
       ${platforms.map(platform => renderPlatformCell(account.platforms[platform])).join('')}
-      <td>${escapeHtml(account.lastCaptured || '')}</td>
+      <td><time datetime="${escapeAttribute(account.lastCaptured)}" title="${escapeAttribute(account.lastCaptured)}">${escapeHtml(displayDate(account.lastCaptured))}</time></td>
       <td>${renderSourceCell(account)}</td>
     </tr>`;
   }).join('') || '<tr><td colspan="8" class="muted">No rows yet. Run a fetch to create the first snapshot.</td></tr>';
@@ -79,11 +84,12 @@ function renderLatest() {
 
 function renderPlatformCell(row) {
   if (!row) return '<td><span class="muted">n.a.</span></td>';
-  const count = row.count ? fmt.format(Number(row.count)) : 'n.a.';
-  const precision = row.count_precision === 'rounded_public' ? 'rounded' : row.count_precision === 'exact_public' ? 'exact' : '';
-  const detail = row.error || [row.raw_display_text, precision, row.fetch_method].filter(Boolean).join(' · ');
+  const observation = row;
+  const count = observation.count !== '' && observation.count != null ? fmt.format(Number(observation.count)) : 'n.a.';
+  const precision = observation.count_precision === 'rounded_public' ? 'rounded' : observation.count_precision === 'exact_public' ? 'exact' : '';
+  const detail = [row.error, observation.raw_display_text, precision, observation.fetch_method].filter(Boolean).join(' · ');
   return `<td>
-    <a class="count-link" href="${escapeAttribute(row.source_url || row.profile_url)}" target="_blank" rel="noreferrer">${escapeHtml(count)}</a>
+    <a class="count-link" href="${escapeAttribute(observation.source_url || observation.profile_url)}" target="_blank" rel="noreferrer">${escapeHtml(count)}</a>
     <div><span class="status ${escapeHtml(row.status)}">${escapeHtml(statusLabel(row.status))}</span></div>
     <div class="muted">${escapeHtml(detail)}</div>
   </td>`;
@@ -106,7 +112,7 @@ function renderHistory() {
     <strong>${escapeHtml(row.name)}</strong>
     <span>${escapeHtml(row.platform)}</span>
     <span>${row.count ? fmt.format(Number(row.count)) : 'n.a.'}</span>
-    <span class="muted">${escapeHtml(row.captured_at)} · ${escapeHtml(statusLabel(row.status))}</span>
+    <span class="muted">${escapeHtml(displayDate(row.captured_at))} · ${escapeHtml(statusLabel(row.status))}</span>
   </div>`).join('') || '<p class="muted">No historical snapshots yet.</p>';
 }
 
@@ -133,7 +139,7 @@ async function load() {
   state.latest = latest.rows || [];
   state.snapshots = [];
   el('subtitle').textContent = latest.generated_at
-    ? `Latest generated ${latest.generated_at}${state.staticMode ? ' · static GitHub Pages mode' : ''}`
+    ? `Latest generated ${displayDate(latest.generated_at)}${state.staticMode ? ' · static GitHub Pages mode' : ''}`
     : 'No snapshots yet';
   el('runNow').disabled = state.staticMode;
   el('runPlatform').disabled = state.staticMode;
@@ -189,6 +195,8 @@ async function runNow() {
 async function pollRunStatus() {
   const button = el('runNow');
   button.disabled = true;
+  button.textContent = 'Fetching...';
+  el('runPlatform').disabled = true;
   while (true) {
     const payload = await fetch('api/run-status').then(res => res.json());
     const status = payload.status || {};
@@ -208,6 +216,7 @@ async function pollRunStatus() {
   } finally {
     button.disabled = false;
     button.textContent = 'Run fetch now';
+    el('runPlatform').disabled = false;
   }
 }
 
@@ -215,6 +224,10 @@ el('runNow').addEventListener('click', runNow);
 for (const id of ['search', 'statusFilter']) {
   el(id).addEventListener('input', renderLatest);
 }
-load().catch(error => {
+load().then(async () => {
+  if (state.staticMode) return;
+  const run = await fetch('api/run-status').then(res => res.json());
+  if (run.running) await pollRunStatus();
+}).catch(error => {
   el('latestRows').innerHTML = `<tr><td colspan="8">${escapeHtml(error.message)}</td></tr>`;
 });

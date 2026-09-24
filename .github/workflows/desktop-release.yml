@@ -1,0 +1,43 @@
+name: Build Windows Desktop Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npx playwright install --only-shell chromium
+      - run: npm ci
+        working-directory: desktop
+      - run: npm run dist
+        working-directory: desktop
+      - name: Test executable
+        shell: pwsh
+        run: |
+          $env:TRACKER_DESKTOP_HOME = Join-Path $env:RUNNER_TEMP 'tracker-smoke'
+          $exe = Get-ChildItem desktop/dist/*Windows-x64.exe | Select-Object -First 1
+          $process = Start-Process -FilePath $exe.FullName -ArgumentList '--smoke-test' -PassThru -Wait -WindowStyle Hidden
+          if ($process.ExitCode -ne 0) { throw 'Desktop smoke test failed' }
+          $result = Get-Content (Join-Path $env:TRACKER_DESKTOP_HOME 'smoke-result.json') -Raw | ConvertFrom-Json
+          if (!$result.packaged -or !$result.nativeWindowLoaded -or $result.sqlite -ne 'ok') { throw 'Desktop verification failed' }
+          Get-FileHash $exe.FullName -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  $($exe.Name)" } | Set-Content desktop/dist/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-desktop
+          path: |
+            desktop/dist/*Windows-x64.exe
+            desktop/dist/SHA256SUMS.txt
+      - name: Publish release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node desktop/publish-release.mjs --publish

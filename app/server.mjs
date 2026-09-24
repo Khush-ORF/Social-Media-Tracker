@@ -3,10 +3,10 @@ import http from 'node:http';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { DATA_DIR, HISTORY_MATRIX_CSV, LATEST_JSON, ROOT, SNAPSHOTS_CSV, parseCsv, readSnapshots, writeHistoryMatrix } from './utils.mjs';
+import { APP_ROOT, DATA_DIR, HISTORY_MATRIX_CSV, LATEST_JSON, ROOT, SNAPSHOTS_CSV, parseCsv, readSnapshots, writeHistoryMatrix } from './utils.mjs';
 
 const PORT = Number(process.env.PORT || 4173);
-const PUBLIC_DIR = path.join(ROOT, 'public');
+const PUBLIC_DIR = path.join(APP_ROOT, 'public');
 let running = null;
 let lastRun = {
   state: 'idle',
@@ -52,8 +52,9 @@ function runCollector(platform = '') {
   const script = fileURLToPath(new URL('./collect.mjs', import.meta.url));
   const args = [script, platform ? '--platform' : '--all'];
   if (platform) args.push(platform);
+  args.push('--render', '--concurrency', '4');
   running = new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, args, { cwd: ROOT });
+    const child = spawn(process.execPath, args, { cwd: ROOT, windowsHide: true });
     let stdout = '';
     let stderr = '';
     child.stdout.on('data', chunk => {
@@ -147,8 +148,10 @@ async function routeApi(req, res, url) {
 
 async function routeStatic(req, res, url) {
   const requested = url.pathname === '/' ? '/index.html' : decodeURIComponent(url.pathname);
-  const fullPath = path.normalize(path.join(PUBLIC_DIR, requested));
-  if (!fullPath.startsWith(PUBLIC_DIR)) {
+  const baseDir = requested.startsWith('/data/') ? path.join(ROOT, 'public') : PUBLIC_DIR;
+  const fullPath = path.resolve(baseDir, `.${requested}`);
+  const relative = path.relative(baseDir, fullPath);
+  if (relative.startsWith('..') || path.isAbsolute(relative)) {
     res.writeHead(403);
     return res.end('Forbidden');
   }
@@ -179,6 +182,8 @@ const server = http.createServer(async (req, res) => {
 });
 
 await fs.mkdir(DATA_DIR, { recursive: true });
-server.listen(PORT, () => {
-  console.log(`Local follower tracker: http://localhost:${PORT}`);
+server.listen(PORT, '127.0.0.1', () => {
+  const url = `http://127.0.0.1:${server.address().port}`;
+  console.log(`Local follower tracker: ${url}`);
+  process.send?.({ type: 'ready', url });
 });

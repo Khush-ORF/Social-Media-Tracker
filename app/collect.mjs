@@ -5,7 +5,27 @@ import { parseFromText, parseMetric } from './parsers.mjs';
 const require = createRequire(import.meta.url);
 const args = process.argv.slice(2);
 const platformArg = args.includes('--platform') ? args[args.indexOf('--platform') + 1] : '';
-const all = args.includes('--all') || !platformArg;
+const idsArg = args.includes('--ids') ? String(args[args.indexOf('--ids') + 1] || '') : '';
+const requestedIds = new Set(idsArg.split(',').map(value => value.trim()).filter(Boolean));
+const all = args.includes('--all') || (!platformArg && !requestedIds.size);
+const fullMode = args.includes('--full') || process.env.COLLECT_MODE === 'full';
+const renderEnabled = fullMode || args.includes('--render') || process.env.COLLECT_RENDER === 'true';
+const concurrencyArg = args.includes('--concurrency') ? Number(args[args.indexOf('--concurrency') + 1]) : 0;
+const githubActions = process.env.GITHUB_ACTIONS === 'true';
+const selfHostedRunner = process.env.RUNNER_ENVIRONMENT === 'self-hosted';
+const overallConcurrency = Number.isFinite(concurrencyArg) && concurrencyArg > 0
+  ? Math.trunc(concurrencyArg)
+  : fullMode
+    ? 4
+    : githubActions && !selfHostedRunner
+      ? 8
+      : 16;
+
+const platformConcurrency = fullMode
+  ? { YouTube: 2, X: 1, LinkedIn: 2, Instagram: 1, Facebook: 1 }
+  : githubActions && !selfHostedRunner
+    ? { YouTube: 6, X: 0, LinkedIn: 4, Instagram: 1, Facebook: 2 }
+    : { YouTube: 8, X: 3, LinkedIn: 6, Instagram: 2, Facebook: 3 };
 
 function runIdFor(date = new Date()) {
   return date.toISOString().replace(/[:.]/g, '-').replace('T', '_').slice(0, 23);
@@ -15,24 +35,14 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function platformDelay(platform) {
-  const githubActions = process.env.GITHUB_ACTIONS === 'true';
-  const selfHostedRunner = process.env.RUNNER_ENVIRONMENT === 'self-hosted';
-  if (selfHostedRunner) return 500;
-  if (!githubActions) return 500;
-  if (platform === 'Instagram') return 12000;
-  if (platform === 'X') return 3500;
-  if (platform === 'Facebook') return 2500;
-  if (platform === 'LinkedIn') return 1500;
-  return 750;
-}
-
 async function fetchStatic(url) {
   let lastError;
-  for (let attempt = 0; attempt < 3; attempt++) {
+  const attempts = fullMode ? 3 : 1;
+  const timeoutMs = fullMode ? 35000 : 12000;
+  for (let attempt = 0; attempt < attempts; attempt++) {
     const response = await fetch(url, {
       redirect: 'follow',
-      signal: AbortSignal.timeout(35000),
+      signal: AbortSignal.timeout(timeoutMs),
       headers: {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36',
         'accept-language': 'en-US,en;q=0.9',
@@ -42,7 +52,7 @@ async function fetchStatic(url) {
     if (response.ok) return { html: await response.text(), source_url: response.url, fetch_method: 'static' };
     lastError = new Error(`HTTP ${response.status}`);
     if (![403, 429, 500, 502, 503, 504].includes(response.status)) throw lastError;
-    await sleep(4000 * (attempt + 1));
+    if (attempt < attempts - 1) await sleep(4000 * (attempt + 1));
   }
   throw lastError;
 }
@@ -93,9 +103,9 @@ async function collectOne(account, runId) {
   };
 
   let firstError = '';
-  const selfHostedRunner = process.env.RUNNER_ENVIRONMENT === 'self-hosted';
-  const renderedFirst = process.env.GITHUB_ACTIONS === 'true' && !selfHostedRunner && ['X', 'Instagram'].includes(account.platform);
-  const fetchers = renderedFirst ? [fetchRendered, fetchStatic] : [fetchStatic, fetchRendered];
+  const renderedFirst = githubActions && !selfHostedRunner && ['X', 'Instagram'].includes(account.platform);
+  const fetchers = renderedFirst && renderEnabled ? [fetchRendered, fetchStatic] : [fetchStatic];
+  if (renderEnabled && !renderedFirst) fetchers.push(fetchRendered);
   for (const fetcher of fetchers) {
     try {
       const page = await fetcher(account.profile_url, account.platform);
@@ -132,25 +142,90 @@ async function collectOne(account, runId) {
   return { ...base, status: 'failed', error: firstError || 'unknown error' };
 }
 
+function platformLimit(platform) {
+  return platformConcurrency[platform] ?? 2;
+}
+
+async function collectMany(accounts, runId) {
+  if (!accounts.length) return [];
+  const rows = new Array(accounts.length);
+  const activeByPlatform = new Map();
+  const queued = accounts.map((account, index) => ({ account, index }));
+  let activeTotal = 0;
+  let completed = 0;
+
+  return await new Promise(resolve => {
+    function tryStart() {
+      while (activeTotal < overallConcurrency) {
+        const queueIndex = queued.findIndex(item => (activeByPlatform.get(item.account.platform) || 0) < platformLimit(item.account.platform));
+        if (queueIndex === -1) break;
+        const [{ account, index }] = queued.splice(queueIndex, 1);
+        activeTotal++;
+        activeByPlatform.set(account.platform, (activeByPlatform.get(account.platform) || 0) + 1);
+        console.log(`${index + 1}/${accounts.length} ${account.platform} ${account.handle || account.profile_url} ... started`);
+        collectOne(account, runId)
+          .then(row => {
+            rows[index] = row;
+            console.log(`${index + 1}/${accounts.length} ${account.platform} ${account.handle || account.profile_url} ... ${row.status}${row.count ? ` (${row.count})` : row.error ? ` - ${row.error}` : ''}`);
+          })
+          .catch(error => {
+            rows[index] = {
+              run_id: runId,
+              id: account.id,
+              name: account.name,
+              website: account.website,
+              platform: account.platform,
+              handle: account.handle,
+              profile_url: account.profile_url,
+              metric_label: '',
+              count: '',
+              raw_display_text: '',
+              count_precision: '',
+              status: 'failed',
+              error: error.message,
+              source_url: '',
+              captured_at: new Date().toISOString(),
+              fetch_method: '',
+              notes: account.notes,
+            };
+            console.log(`${index + 1}/${accounts.length} ${account.platform} ${account.handle || account.profile_url} ... failed - ${error.message}`);
+          })
+          .finally(() => {
+            activeTotal--;
+            activeByPlatform.set(account.platform, Math.max(0, (activeByPlatform.get(account.platform) || 1) - 1));
+            completed++;
+            if (completed === accounts.length) resolve(rows);
+            else tryStart();
+          });
+      }
+    }
+    tryStart();
+  });
+}
+
 async function main() {
   await ensureDataDirs();
   const requestedPlatform = platformArg ? platformArg.toLowerCase() : '';
-  const accounts = (await readAccounts()).filter(row => all || row.platform.toLowerCase() === requestedPlatform);
+  const accounts = (await readAccounts()).filter(row => {
+    if (requestedIds.size && !requestedIds.has(row.id)) return false;
+    return all || !requestedPlatform || row.platform.toLowerCase() === requestedPlatform;
+  });
   const runId = runIdFor();
-  const rows = [];
-  for (let i = 0; i < accounts.length; i++) {
-    const account = accounts[i];
-    process.stdout.write(`${i + 1}/${accounts.length} ${account.platform} ${account.handle || account.profile_url} ... `);
-    const row = await collectOne(account, runId);
-    rows.push(row);
-    console.log(`${row.status}${row.count ? ` (${row.count})` : row.error ? ` - ${row.error}` : ''}`);
-    await sleep(platformDelay(account.platform));
-  }
+  console.log(JSON.stringify({
+    mode: fullMode ? 'full' : 'fast',
+    render_enabled: renderEnabled,
+    overall_concurrency: overallConcurrency,
+    platform_concurrency: platformConcurrency,
+    targets: accounts.length,
+  }, null, 2));
+  const rows = await collectMany(accounts, runId);
   await appendSnapshots(rows);
   await writeRun(runId, rows);
   const allSnapshots = await readSnapshots();
   const matrix = await writeHistoryMatrix(allSnapshots);
-  const latest = await writeLatest(allSnapshots, accounts);
+  const latest = await writeLatest(allSnapshots, await readAccounts());
+  await import('./sync_sqlite.mjs');
+  await import('./export_public_data.mjs');
   const summary = {
     run_id: runId,
     targets: rows.length,

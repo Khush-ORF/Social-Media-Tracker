@@ -1,0 +1,32 @@
+{
+  "name": "social-follower-tracker-desktop",
+  "productName": "Social Follower Tracker",
+  "version": "0.2.0",
+  "description": "Local social follower tracker with fresh collection and CSV/SQLite history",
+  "author": "Khush-ORF",
+  "private": true,
+  "main": "main.cjs",
+  "scripts": {
+    "prepare:runtime": "node prepare.mjs",
+    "start": "npm run prepare:runtime && electron .",
+    "dist": "npm run prepare:runtime && electron-builder --win portable --x64 --publish never",
+    "pack": "npm run prepare:runtime && electron-builder --win --x64 --dir --publish never"
+  },
+  "devDependencies": {
+    "electron": "44.4.5",
+    "electron-builder": "26.16.1"
+  },
+  "build": {
+    "appId": "org.khushorf.socialtracker",
+    "directories": { "output": "dist" },
+    "files": ["main.cjs", "package.json"],
+    "extraResources": [
+      { "from": "build/runtime", "to": "runtime" },
+      { "from": "build/runtime/node_modules/playwright", "to": "runtime/node_modules/playwright", "filter": ["**/*"] },
+      { "from": "build/runtime/node_modules/playwright-core", "to": "runtime/node_modules/playwright-core", "filter": ["**/*"] },
+      { "from": "build/browsers", "to": "browsers" }
+    ],
+    "win": { "target": ["portable"], "signAndEditExecutable": false },
+    "portable": { "artifactName": "Social-Follower-Tracker-${version}-Windows-x64.exe", "requestExecutionLevel": "user" }
+  }
+}
