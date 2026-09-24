@@ -15,9 +15,10 @@ await fs.cp(path.join(root, 'data'), path.join(runtime, 'data'), {
   recursive: true,
   filter: source => !source.endsWith('-wal') && !source.endsWith('-shm'),
 });
-for (const module of ['playwright', 'playwright-core']) {
-  await fs.cp(path.join(root, 'node_modules', module), path.join(runtime, 'node_modules', module), { recursive: true });
-}
+await fs.cp(path.join(root, 'node_modules'), path.join(runtime, 'node_modules'), {
+  recursive: true,
+  filter: source => !source.includes(`${path.sep}.cache${path.sep}`),
+});
 const manifest = JSON.parse(await fs.readFile(path.join(root, 'node_modules/playwright-core/browsers.json'), 'utf8'));
 const cache = process.env.PLAYWRIGHT_BROWSERS_PATH || path.join(process.env.LOCALAPPDATA, 'ms-playwright');
 for (const name of ['chromium-headless-shell', 'ffmpeg', 'winldd']) {

@@ -1,11 +1,14 @@
 import fs from 'node:fs/promises';
 import http from 'node:http';
+import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { APP_ROOT, DATA_DIR, HISTORY_MATRIX_CSV, LATEST_JSON, ROOT, SNAPSHOTS_CSV, parseCsv, readSnapshots, writeHistoryMatrix } from './utils.mjs';
+import { currentRunCsv, platformHistoryWorkbook } from './exports.mjs';
 
 const PORT = Number(process.env.PORT || 4173);
+const HOST = process.env.HOST || '127.0.0.1';
 const PUBLIC_DIR = path.join(APP_ROOT, 'public');
 let running = null;
 let lastRun = {
@@ -123,6 +126,38 @@ async function routeApi(req, res, url) {
       throw error;
     }
   }
+  if (url.pathname === '/api/download/current-run.csv') {
+    const csv = currentRunCsv(await readSnapshots());
+    res.writeHead(200, { 'content-type': 'text/csv; charset=utf-8', 'content-disposition': 'attachment; filename="current-run.csv"' });
+    return res.end(csv);
+  }
+  if (url.pathname === '/api/download/dataset.xlsx') {
+    const buffer = await platformHistoryWorkbook(await readSnapshots());
+    res.writeHead(200, {
+      'content-type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'content-disposition': 'attachment; filename="social-follower-dataset.xlsx"',
+    });
+    return res.end(Buffer.from(buffer));
+  }
+  if (url.pathname === '/api/download/database.sqlite') {
+    const databasePath = path.join(DATA_DIR, 'follower_tracker.sqlite');
+    let tempDir = '';
+    try {
+      const { DatabaseSync, backup } = await import('node:sqlite');
+      const db = new DatabaseSync(databasePath);
+      tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'social-tracker-db-'));
+      const copyPath = path.join(tempDir, 'follower_tracker.sqlite');
+      try { await backup(db, copyPath); } finally { db.close(); }
+      const database = await fs.readFile(copyPath);
+      res.writeHead(200, { 'content-type': 'application/vnd.sqlite3', 'content-disposition': 'attachment; filename="follower_tracker.sqlite"' });
+      return res.end(database);
+    } catch (error) {
+      if (error.code === 'ENOENT') { res.writeHead(404); return res.end('Database not available yet'); }
+      throw error;
+    } finally {
+      if (tempDir) await fs.rm(tempDir, { recursive: true, force: true });
+    }
+  }
   if (url.pathname === '/api/download/history_matrix.csv') {
     try {
       const snapshots = await readSnapshots();
@@ -182,8 +217,9 @@ const server = http.createServer(async (req, res) => {
 });
 
 await fs.mkdir(DATA_DIR, { recursive: true });
-server.listen(PORT, '127.0.0.1', () => {
-  const url = `http://127.0.0.1:${server.address().port}`;
+server.listen(PORT, HOST, () => {
+  const displayHost = HOST === '0.0.0.0' ? '127.0.0.1' : HOST;
+  const url = `http://${displayHost}:${server.address().port}`;
   console.log(`Local follower tracker: ${url}`);
   process.send?.({ type: 'ready', url });
 });

@@ -15,8 +15,12 @@ jobs:
         with:
           node-version: 24
       - run: npm ci
+      - run: npm audit --omit=dev
+      - run: npx --yes eslint@9 --no-config-lookup --rule "no-eval:error" --rule "no-implied-eval:error" --rule "no-new-func:error" --rule "no-unsafe-optional-chaining:error" "app/*.mjs" "deployment/*.mjs" "desktop/prepare.mjs"
       - run: npx playwright install --only-shell chromium
       - run: npm ci
+        working-directory: desktop
+      - run: npm audit
         working-directory: desktop
       - run: npm run dist
         working-directory: desktop
@@ -30,6 +34,13 @@ jobs:
           $result = Get-Content (Join-Path $env:TRACKER_DESKTOP_HOME 'smoke-result.json') -Raw | ConvertFrom-Json
           if (!$result.packaged -or !$result.nativeWindowLoaded -or $result.sqlite -ne 'ok') { throw 'Desktop verification failed' }
           Get-FileHash $exe.FullName -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  $($exe.Name)" } | Set-Content desktop/dist/SHA256SUMS.txt
+      - name: Enforce package size limits
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem desktop/dist/*Windows-x64.exe | Select-Object -First 1
+          if ($exe.Length -ge 50MB) { throw "Installer exceeds 50 MB: $([math]::Round($exe.Length / 1MB, 1)) MB" }
+          $installedBytes = (Get-ChildItem desktop/dist/win-unpacked -File -Recurse | Measure-Object Length -Sum).Sum
+          if ($installedBytes -ge 100MB) { throw "Installed app exceeds 100 MB: $([math]::Round($installedBytes / 1MB, 1)) MB" }
       - uses: actions/upload-artifact@v4
         with:
           name: windows-desktop

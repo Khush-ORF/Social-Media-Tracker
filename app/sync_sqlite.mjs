@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { ACCOUNTS_FILE, APP_ROOT, DATA_DIR, ROOT, parseCsv, readSnapshots } from './utils.mjs';
+import { APP_ROOT, DATA_DIR, ROOT, readAccounts, readSnapshots } from './utils.mjs';
 
 const dbPath = path.join(DATA_DIR, 'follower_tracker.sqlite');
 const schemaPath = path.join(APP_ROOT, 'sql', 'schema.sql');
@@ -57,7 +57,7 @@ async function runSql(sql) {
 }
 
 const schema = await fs.readFile(schemaPath, 'utf8');
-const accounts = parseCsv(await fs.readFile(ACCOUNTS_FILE, 'utf8'));
+const accounts = await readAccounts();
 const snapshots = await readSnapshots();
 
 const accountSql = accounts.map(row => `INSERT INTO accounts (

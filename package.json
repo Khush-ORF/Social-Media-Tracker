@@ -12,7 +12,10 @@
     "build:static": "node app/sync_sqlite.mjs && node app/export_public_data.mjs"
   },
   "dependencies": {
+    "exceljs": "4.4.0",
     "playwright": "1.62.1"
+  },
+  "overrides": {
+    "uuid": "11.1.1"
   }
 }
-

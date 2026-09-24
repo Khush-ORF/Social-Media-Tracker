@@ -83,16 +83,46 @@ export function toCsv(rows, columns) {
   return [columns.join(','), ...rows.map(row => columns.map(column => quote(row[column])).join(','))].join('\r\n') + '\r\n';
 }
 
+const ACCOUNT_PLATFORMS = ['Facebook', 'LinkedIn', 'X', 'Instagram', 'YouTube'];
+
+function accountId(name, platform) {
+  const slug = String(name).normalize('NFKD').replace(/[^\w]+/g, '-').replace(/^-|-$/g, '').toLowerCase();
+  return `${slug || 'account'}-${platform.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+}
+
+function profileUrl(value, platform) {
+  const raw = String(value ?? '').trim();
+  if (!raw) return '';
+  if (/^https?:\/\//i.test(raw)) return raw;
+  const handle = raw.replace(/^@/, '').replace(/^\/+|\/+$/g, '');
+  const bases = {
+    Facebook: 'https://www.facebook.com/',
+    LinkedIn: 'https://www.linkedin.com/company/',
+    X: 'https://x.com/',
+    Instagram: 'https://www.instagram.com/',
+    YouTube: 'https://www.youtube.com/',
+  };
+  return `${bases[platform]}${handle}`;
+}
+
 export async function readAccounts() {
   const text = await fs.readFile(ACCOUNTS_FILE, 'utf8');
-  return parseCsv(text)
-    .map(row => ({
-      ...row,
-      active: /^(true|yes|1)$/i.test(String(row.active ?? '').trim()),
-      platform: normalizePlatform(row.platform),
-      profile_url: String(row.profile_url ?? '').trim(),
-    }))
-    .filter(row => row.active && row.profile_url);
+  const sourceRows = parseCsv(text);
+  if (sourceRows.length && 'platform' in sourceRows[0]) {
+    return sourceRows
+      .filter(row => /^(true|yes|1)$/i.test(String(row.active ?? '').trim()))
+      .map(row => ({ ...row, platform: normalizePlatform(row.platform), profile_url: String(row.profile_url ?? '').trim() }))
+      .filter(row => row.profile_url);
+  }
+  return sourceRows.flatMap(row => ACCOUNT_PLATFORMS.flatMap(platform => {
+    const url = profileUrl(row[platform] ?? row[platform === 'YouTube' ? 'Youtube' : platform], platform);
+    if (!url) return [];
+    const handle = url.replace(/\/$/, '').split('/').at(-1).replace(/^@/, '');
+    return [{
+      id: accountId(row.Name, platform), name: String(row.Name ?? '').trim(), website: String(row.Website ?? '').trim(),
+      platform, handle, profile_url: url, active: true, notes: '',
+    }];
+  }));
 }
 
 export function normalizePlatform(value) {
@@ -162,9 +192,10 @@ export async function writeRun(runId, rows) {
 
 export function buildLatest(allRows, accounts = null) {
   const allowedIds = accounts ? new Set(accounts.map(account => account.id)) : null;
+  const allowedNames = accounts ? new Set(accounts.map(account => `${account.name}\u0000${account.platform}`)) : null;
   const latest = new Map();
   for (const row of allRows) {
-    if (allowedIds && !allowedIds.has(row.id)) continue;
+    if (allowedIds && !allowedIds.has(row.id) && !allowedNames.has(`${row.name}\u0000${row.platform}`)) continue;
     const key = `${row.id}\u0000${row.platform}`;
     const current = latest.get(key);
     if (!current || String(row.captured_at) > String(current.captured_at)) latest.set(key, row);

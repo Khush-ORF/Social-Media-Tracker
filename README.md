@@ -1,6 +1,6 @@
 # Social Media Tracker
 
-A zero-subscription desktop tracker for publicly visible follower and subscriber counts.
+A zero-subscription tracker for publicly visible follower and subscriber counts. It includes a Windows desktop app and a separate unattended server deployment.
 
 The app tracks curated public accounts across YouTube, X, LinkedIn, Instagram, and Facebook. It stores every collection attempt in CSV and SQLite, shows a local dashboard, and exports spreadsheet-friendly files. It does not use paid APIs, paid scraping services, or business-account authentication.
 
@@ -43,11 +43,13 @@ Input file:
 accounts.csv
 ```
 
-Required columns:
+The current input format has one organization per row:
 
 ```text
-id,name,website,platform,handle,profile_url,active,notes
+Name,Website,Facebook,LinkedIn,X,Instagram,Youtube
 ```
+
+Each social column accepts a full public profile URL or a platform handle. Blank cells mean that platform is not tracked for that organization. The reader still accepts the older internal per-platform format for existing installations.
 
 Primary output files:
 
@@ -61,7 +63,7 @@ data/runs/*.json
 
 `snapshots.csv` is the audit log with one row per account, platform, and collection run. It preserves failures as rows.
 
-`history_matrix.csv` is the spreadsheet-friendly wide format with platform columns for each organization and run.
+`history_matrix.csv` is the spreadsheet-friendly wide format with platform columns for each organization and run. The dashboard's **Download CSV** link exports only the latest completed run. **Download Data Set** creates an `.xlsx` workbook with a separate platform sheet and one count column per observation date; source cells are clickable.
 
 `latest.json` powers the dashboard.
 
@@ -80,7 +82,7 @@ sql/schema.sql                         SQLite schema
 package.json                           Local server/collector scripts
 ```
 
-The repository is now focused on the downloadable desktop app. Old GitHub Pages, hosted scheduled collection, worker, and research scan artifacts have been removed from tracked source.
+`deployment/` contains the independent server setup, database, start/stop, and month-end scheduling scripts. It uses SQLite and a lightweight local Node server.
 
 ## Local Development
 
@@ -140,6 +142,14 @@ The executable is written to:
 desktop/dist/
 ```
 
+The current Electron and bundled Chromium executable is about 196 MB. It does not meet a 50 MB download or 100 MB installed-footprint target. Those limits require replacing the Electron/Chromium bundle with a thin WebView client and using an already-installed browser/runtime, or deploying the server app without a bundled desktop executable.
+
+The release workflow now enforces both size limits and will stop before publishing while the current Electron build exceeds them.
+
+## Server Deployment
+
+See [deployment/README.md](deployment/README.md). On Windows, run `deployment/install-windows.bat` as administrator. On Linux or macOS, run `sh deployment/install-unix.sh`. Both set up SQLite, the local dashboard, and a daily month-end check that collects only on the last calendar day in Indian Standard Time.
+
 For an unpacked test build:
 
 ```powershell
@@ -184,3 +194,8 @@ The desktop app is designed for zero-dollar operation:
 - No hosted database.
 - Local SQLite file.
 - Local CSV exports.
+- Local server scheduling via Task Scheduler or cron.
+
+## Security Checks
+
+Both the production dependency tree and desktop build dependency tree pass `npm audit` with zero reported vulnerabilities. The release workflow runs those audits and targeted ESLint rules for dynamic code execution patterns before building. The dashboard binds to localhost by default; the deployment instructions require an authenticated HTTPS reverse proxy before exposing it to a network.
