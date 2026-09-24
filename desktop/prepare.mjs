@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 const desktop = path.dirname(fileURLToPath(import.meta.url));
 const root = path.dirname(desktop);
 const runtime = path.join(desktop, 'build/runtime');
+await fs.rm(path.join(desktop, 'build'), { recursive: true, force: true });
 await fs.mkdir(runtime, { recursive: true });
 for (const folder of ['app', 'public', 'sql']) {
   await fs.cp(path.join(root, folder), path.join(runtime, folder), { recursive: true });

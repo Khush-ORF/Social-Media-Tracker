@@ -16,7 +16,7 @@ const browserPath = app.isPackaged ? path.join(process.resourcesPath, 'browsers'
 async function seedRecords() {
   await fs.mkdir(dataRoot, { recursive: true });
   try { await fs.access(path.join(dataRoot, 'accounts.csv')); return; } catch {}
-  for (const folder of ['data', 'public/data']) {
+  for (const folder of ['data']) {
     await fs.cp(path.join(runtime, folder), path.join(dataRoot, folder), { recursive: true, force: false, errorOnExist: false });
   }
   await fs.copyFile(path.join(runtime, 'accounts.csv'), path.join(dataRoot, 'accounts.csv'));

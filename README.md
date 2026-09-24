@@ -1,108 +1,47 @@
 # Social Media Tracker
 
-A zero-subscription social follower tracker for public institutional accounts.
+A zero-subscription desktop tracker for publicly visible follower and subscriber counts.
 
-This project tracks publicly visible follower/subscriber counts for think tank and policy organization accounts across:
+The app tracks curated public accounts across YouTube, X, LinkedIn, Instagram, and Facebook. It stores every collection attempt in CSV and SQLite, shows a local dashboard, and exports spreadsheet-friendly files. It does not use paid APIs, paid scraping services, or business-account authentication.
 
-- YouTube
-- X
-- LinkedIn
-- Instagram
-- Facebook
+## Download
 
-It is designed to run locally and on GitHub for free. The app keeps a historical dataset over time, exposes CSV/JSON exports, stores records in SQLite, and publishes a static dashboard with GitHub Pages.
+Download the Windows x64 executable from:
 
-## Windows Desktop App
+https://github.com/Khush-ORF/Social-Media-Tracker/releases
 
-Download the Windows x64 `.exe` from [GitHub Releases](https://github.com/Khush-ORF/Social-Media-Tracker/releases). Run it to open the tracker in a desktop window. Node.js, the headless browser, and SQLite support are bundled; no separate installation or subscription is required. Internet access is needed for collection.
+The release is a portable `.exe`. Node.js, Playwright, the headless browser runtime, and SQLite support are bundled inside the app. Internet access is required when collecting fresh counts.
 
-The desktop app includes the current account list and historical dataset on its first launch. Check the displayed observation dates and click **Run fetch now** for fresh counts. Select one platform or all platforms, then keep the application open until the run completes. Reloading the view reconnects to collection progress. Missing counts remain missing; the app never substitutes an older value for a failed request.
+This release is unsigned, so Windows may show an unknown-publisher warning. Release assets include `SHA256SUMS.txt` for verification.
 
-Use the **File** menu to open the data folder, edit `accounts.csv`, or export either history CSV. On Windows, records normally live under `%APPDATA%/Social Follower Tracker/records`. The **Open data folder** command shows the exact location. Back up that entire folder, including `accounts.csv` and `data/`. Replacing the executable does not overwrite existing records. Each Windows user has their own records. The desktop app uses its own available local port and can run alongside the development server.
+## Desktop Use
 
-The executable is a portable Windows 10/11 x64 application. It extracts its bundled runtime at startup, so the first launch may take a moment. This free release is unsigned; Windows may show an unknown-publisher warning. Release assets include a SHA-256 checksum. There is no desktop background scheduler: collection runs while the app is open. GitHub Actions remains the separate scheduled option.
+Run the executable to open the tracker dashboard.
 
-### Build The Desktop Executable
-
-Use Windows x64 and Node.js 24:
-
-```powershell
-npm install
-npx playwright install --only-shell chromium
-cd desktop
-npm ci
-npm run dist
-```
-
-The standalone executable is written to `desktop/dist/`. Packaging code is in `desktop/`; only the tracker code, dependencies, account list, and historical data are bundled. Research working files are excluded. `npm run pack` produces an unpacked app for testing. The manual **Build Windows Desktop Release** workflow builds, tests, and uploads a release using the version in `desktop/package.json`; increment that version and update the release notes for each new release.
-
-## What This Does
-
-The tracker uses a manually curated `accounts.csv` containing official or corroborated social media profile URLs. A collector visits each public profile page, extracts the visible follower/subscriber count where available, and appends the result to the historical dataset.
-
-The dashboard displays the latest collected values in a matrix:
+The first launch copies the bundled account list and seed dataset into your Windows user data folder:
 
 ```text
-Account | YouTube | X | LinkedIn | Instagram | Facebook | Last captured | Source
+%APPDATA%/Social Follower Tracker/records
 ```
 
-The raw history is stored in long format so every fetch is preserved:
+Use the app menu:
+
+- `File -> Open data folder` to inspect the records.
+- `File -> Edit accounts.csv` to edit the tracked profiles.
+- `File -> Export history matrix...` for the wide spreadsheet file.
+- `File -> Export raw history...` for the full long-format audit log.
+
+Click `Run fetch now` to collect fresh counts. You can run all platforms or one selected platform. Keep the app open until collection finishes. The dashboard reconnects to progress after reloads.
+
+Failed or blocked pages remain missing in the latest table. The app does not substitute an older value for a failed fresh request.
+
+## Data Model
+
+Input file:
 
 ```text
-run_id, account, platform, count, status, source_url, captured_at
+accounts.csv
 ```
-
-A generated history matrix is also available for spreadsheet use.
-
-## Important Limitations
-
-This project intentionally avoids paid APIs and business-account authentication.
-
-That means:
-
-- It only uses publicly visible account/profile pages.
-- Scraping is best-effort and can break when platforms change markup.
-- Some pages may block GitHub Actions or headless browsers.
-- YouTube often exposes only rounded public subscriber counts, such as `2.06M`.
-- Instagram sometimes exposes exact public follower counts in embedded page data.
-- Facebook, LinkedIn, and X counts depend on what the public page exposes at fetch time.
-
-The app records failures and missing counts instead of hiding them.
-
-## Repository Structure
-
-```text
-accounts.csv                    Input account list
-app/
-  collect.mjs                   Collector CLI
-  server.mjs                    Local dashboard server and API
-  parsers.mjs                   Platform count parsers
-  utils.mjs                     CSV, snapshot, matrix utilities
-  build_accounts_from_profiles.mjs
-  scan_official_social_links.mjs
-  sync_sqlite.mjs               Sync CSV records into SQLite
-  export_public_data.mjs        Export static dashboard data
-data/
-  snapshots.csv                 Raw historical records
-  history_matrix.csv            Pivoted historical matrix
-  latest.json                   Latest row per account/platform
-  follower_tracker.sqlite       SQLite database
-  runs/                         Per-run JSON files
-public/
-  index.html                    Dashboard
-  app.js
-  styles.css
-  data/                         Static files for GitHub Pages
-sql/
-  schema.sql                    SQLite schema
-.github/workflows/
-  collect.yml                   Manual/monthly collection workflow
-  pages.yml                     GitHub Pages deployment workflow
-```
-
-## Account List
-
-The tracker reads `accounts.csv`.
 
 Required columns:
 
@@ -110,373 +49,138 @@ Required columns:
 id,name,website,platform,handle,profile_url,active,notes
 ```
 
-Current coverage:
+Primary output files:
 
 ```text
-Total rows: 387
-YouTube:   88
-X:         79
-LinkedIn:  94
-Instagram: 60
-Facebook:  66
+data/snapshots.csv
+data/history_matrix.csv
+data/latest.json
+data/follower_tracker.sqlite
+data/runs/*.json
 ```
 
-LinkedIn coverage is complete for all 94 organizations. Other platform coverage reflects accounts found from existing verified profile evidence plus official website scans.
+`snapshots.csv` is the audit log with one row per account, platform, and collection run. It preserves failures as rows.
 
-## Local Setup
+`history_matrix.csv` is the spreadsheet-friendly wide format with platform columns for each organization and run.
 
-Install dependencies:
+`latest.json` powers the dashboard.
 
-```bash
-npm install
+`follower_tracker.sqlite` mirrors the CSV records into SQLite tables.
+
+## Repository Structure
+
+```text
+.github/workflows/desktop-release.yml  Manual Windows release build
+accounts.csv                           Curated account list
+app/                                   Collector, parsers, local server, exports
+data/                                  Seed history bundled into the app
+desktop/                               Electron desktop wrapper and release scripts
+public/                                Local dashboard UI
+sql/schema.sql                         SQLite schema
+package.json                           Local server/collector scripts
 ```
 
-Install Playwright browser binaries if needed:
+The repository is now focused on the downloadable desktop app. Old GitHub Pages, hosted scheduled collection, worker, and research scan artifacts have been removed from tracked source.
 
-```bash
-npx playwright install chromium
+## Local Development
+
+Use Windows x64 and Node.js 24.
+
+Install root dependencies:
+
+```powershell
+npm ci
+npx playwright install --only-shell chromium
 ```
 
-Start the local dashboard:
+Run the local dashboard:
 
-```bash
+```powershell
 npm start
 ```
 
 Then open:
 
 ```text
-http://localhost:4173
+http://127.0.0.1:4173
 ```
 
-## Running Collection Locally
-
-Run all platforms:
-
-```bash
-npm run collect
-```
-
-Run a single platform:
-
-```bash
-npm run collect:x
-```
-
-Or directly:
-
-```bash
-node app/collect.mjs --platform LinkedIn
-node app/collect.mjs --platform Instagram
-node app/collect.mjs --platform Facebook
-node app/collect.mjs --platform YouTube
-node app/collect.mjs --platform X
-```
-
-For local use, prefer one platform at a time. A full run currently covers hundreds of accounts and can take a while.
-
-## Dashboard Collection
-
-The local dashboard has a `Run fetch now` button.
-
-Locally, this starts a fresh collection through the local server with browser rendering enabled and four concurrent requests. The status line shows live progress and reconnects after a page reload. Completed runs update CSV history, SQLite, and the public exports.
-
-The latest table reflects the newest attempt for each account. A failed attempt remains missing; older counts are never substituted. Earlier observations remain available in history. Results appear when the run finishes.
-
-For the same collection behaviour from the terminal, use `node app/collect.mjs --all --render --concurrency 4`. The default CLI fast mode omits browser rendering and may miss counts on pages that require JavaScript.
-
-On GitHub Pages, the dashboard is read-only. The fetch button is disabled online because a static site cannot safely store a GitHub token. Use GitHub Actions to run collection, then the dashboard updates after the generated data is pushed.
-
-## Data Files
-
-### Raw History
-
-```text
-data/snapshots.csv
-```
-
-One row per account/platform/fetch.
-
-This is the main audit log.
-
-### Latest Snapshot
-
-```text
-data/latest.json
-```
-
-Latest row per account/platform for the dashboard.
-
-### History Matrix
-
-```text
-data/history_matrix.csv
-```
-
-Pivoted historical format:
-
-```text
-run_id,captured_date,name,website,
-youtube_count,youtube_raw,youtube_precision,youtube_status,youtube_source,
-x_count,x_raw,x_precision,x_status,x_source,
-linkedin_count,...
-instagram_count,...
-facebook_count,...
-last_captured_at
-```
-
-### SQLite
-
-```text
-data/follower_tracker.sqlite
-```
-
-Tables:
-
-- `accounts`
-- `snapshots`
-
-Sync CSV data into SQLite:
-
-```bash
-npm run sync:sqlite
-```
-
-Inspect locally:
-
-```bash
-sqlite3 data/follower_tracker.sqlite
-```
-
-Example queries:
-
-```sql
-SELECT platform, COUNT(*) FROM accounts GROUP BY platform;
-
-SELECT platform, COUNT(*) FROM snapshots GROUP BY platform;
-
-SELECT name, platform, count, status, captured_at
-FROM snapshots
-ORDER BY captured_at DESC
-LIMIT 20;
-```
-
-## Static Export
-
-GitHub Pages serves static files from `public/`.
-
-Generate static dashboard data:
-
-```bash
-npm run export:public
-```
-
-Build everything needed for static deployment:
-
-```bash
-npm run build:static
-```
-
-This updates:
-
-```text
-public/data/latest.json
-public/data/snapshots.json
-public/data/snapshots.csv
-public/data/history_matrix.csv
-```
-
-## GitHub Pages Deployment
-
-The repository includes:
-
-```text
-.github/workflows/pages.yml
-```
-
-This workflow:
-
-1. Installs Node.
-2. Installs SQLite.
-3. Runs `npm ci`.
-4. Runs `npm run build:static`.
-5. Deploys `public/` to GitHub Pages.
-
-To enable Pages:
-
-```text
-GitHub repo → Settings → Pages → Source: GitHub Actions
-```
-
-## GitHub Actions Collection
-
-The repository includes:
-
-```text
-.github/workflows/collect.yml
-```
-
-It supports:
-
-- Manual collection from GitHub Actions.
-- Scheduled monthly collection on the last UTC day of each month.
-
-Manual run:
-
-```text
-GitHub repo → Actions → Collect Follower Counts → Run workflow
-```
-
-Optional platform input:
-
-```text
-YouTube
-X
-LinkedIn
-Instagram
-Facebook
-```
-
-If no platform is supplied, the workflow runs the hosted-safe platform set: YouTube, LinkedIn, Facebook, and Instagram.
-
-On GitHub-hosted Actions, the default all-platform run excludes X. X blocks GitHub Actions IP ranges too aggressively to be reliable.
-
-To run X online, configure a GitHub self-hosted runner on a Windows machine. When the workflow input is `X`, `.github/workflows/collect.yml` uses:
-
-```yaml
-runs-on: [self-hosted, Windows]
-```
-
-That means the X job runs from your own machine/network, but it is still triggered online through GitHub Actions.
-
-### Windows Self-Hosted Runner for X
-
-1. Go to:
-
-```text
-GitHub repo -> Settings -> Actions -> Runners -> New self-hosted runner -> Windows x64
-```
-
-2. Follow GitHub's setup commands on the Windows machine that should collect X.
-
-3. Install or verify these tools on that machine:
+Run collection from the terminal:
 
 ```powershell
-node --version
-npm --version
-git --version
-sqlite3 --version
+node app/collect.mjs --all --render --concurrency 4
 ```
 
-4. If `sqlite3` is not in PATH, either add it to PATH or set `SQLITE3_BIN` for the runner service. The app also checks this common MSYS path automatically:
+Run one platform:
+
+```powershell
+node app/collect.mjs --platform X --render --concurrency 4
+```
+
+The plain `npm run collect` script uses the collector defaults. For best local completeness, use `--render`.
+
+## Build The Desktop App
+
+Install desktop dependencies:
+
+```powershell
+cd desktop
+npm ci
+```
+
+Build the portable executable:
+
+```powershell
+npm run dist
+```
+
+The executable is written to:
 
 ```text
-C:\msys64\ucrt64\bin\sqlite3.exe
+desktop/dist/
 ```
 
-5. Start the runner and keep it online when you trigger X collection.
+For an unpacked test build:
 
-After that, from GitHub Actions, choose:
+```powershell
+npm run pack
+```
+
+## Release Workflow
+
+The only tracked GitHub workflow is:
 
 ```text
-X
+.github/workflows/desktop-release.yml
 ```
 
-The job will run on your machine, collect X, rebuild the public data, and push the updated dataset back to GitHub Pages.
+It can be run manually from GitHub Actions. It builds the Windows portable executable, smoke-tests the packaged app, writes a SHA-256 checksum, uploads build artifacts, and publishes a GitHub release using the version in `desktop/package.json`.
 
-If you do not configure a self-hosted runner, X runs will stay queued. In that case, run X locally with:
+Before making a new public release:
 
-```bash
-node app/collect.mjs --platform X
-npm run build:static
-git add data public/data
-git commit -m "Update X follower snapshots"
-git push
-```
+1. Update `desktop/package.json` version.
+2. Update `desktop/release-notes.md`.
+3. Commit and push.
+4. Run `Build Windows Desktop Release` from GitHub Actions.
 
-The scheduled workflow runs on the 28th-31st but only collects when tomorrow is the first day of a new month. This handles months that do not have a 31st.
+## Limitations
 
-After collection, the workflow commits updated files under:
+This app reads public profile pages only.
 
-```text
-data/
-public/data/
-```
+- Some pages block automated or headless requests.
+- Platform markup can change.
+- YouTube often exposes rounded subscriber counts.
+- Instagram, X, LinkedIn, and Facebook expose different levels of detail depending on the profile and request path.
+- Personal LinkedIn/Facebook profiles are out of scope; organization pages are the target.
 
-## Rebuilding `accounts.csv`
+The tracker records what happened during each run instead of hiding failures.
 
-The account list is generated from:
+## Cost
 
-- Existing verified profile evidence.
-- Manual corrections for missing LinkedIn rows.
-- Official website scan results.
+The desktop app is designed for zero-dollar operation:
 
-Rebuild:
-
-```bash
-npm run build:accounts
-```
-
-Re-scan official websites for social links:
-
-```bash
-npm run scan:social
-npm run build:accounts
-```
-
-The scan audit is saved at:
-
-```text
-research/official_social_scan.json
-```
-
-## Count Precision
-
-Each collected row includes `count_precision`.
-
-Possible values:
-
-```text
-exact_public
-rounded_public
-```
-
-Examples:
-
-- Instagram may expose `6615663`, recorded as `exact_public`.
-- YouTube may expose `2.06M`, recorded as `rounded_public` and parsed as `2060000`.
-
-The tracker preserves the original displayed value in `raw_display_text`.
-
-## Recommended Workflow
-
-For normal use:
-
-1. Update `accounts.csv` if needed.
-2. Run one platform locally to test:
-
-   ```bash
-   node app/collect.mjs --platform X
-   ```
-
-3. Sync/export:
-
-   ```bash
-   npm run build:static
-   ```
-
-4. Commit and push.
-5. Use GitHub Actions for monthly collection.
-
-## Notes on Cost
-
-This project is designed for zero-dollar operation:
-
-- GitHub repository: free
-- GitHub Actions: free within account limits
-- GitHub Pages: free
-- SQLite: local file, free
-- No paid APIs
-- No paid scraping services
-
-Reliability depends on public platform behavior.
+- No paid APIs.
+- No subscriptions.
+- No hosted database.
+- Local SQLite file.
+- Local CSV exports.

@@ -139,13 +139,13 @@ async function load() {
   state.latest = latest.rows || [];
   state.snapshots = [];
   el('subtitle').textContent = latest.generated_at
-    ? `Latest generated ${displayDate(latest.generated_at)}${state.staticMode ? ' · static GitHub Pages mode' : ''}`
+    ? `Latest generated ${displayDate(latest.generated_at)}${state.staticMode ? ' · read-only static mode' : ''}`
     : 'No snapshots yet';
   el('runNow').disabled = state.staticMode;
   el('runPlatform').disabled = state.staticMode;
   if (state.staticMode) {
     el('runNow').textContent = 'Fetch disabled online';
-    el('runStatus').textContent = 'Static viewer: run collection from GitHub Actions. The dashboard updates after new data is pushed.';
+    el('runStatus').textContent = 'Read-only static viewer. Open the desktop app or local server to run collection.';
   } else {
     el('runNow').textContent = 'Run fetch now';
     el('runPlatform').disabled = false;
@@ -170,7 +170,7 @@ async function loadHistoryInBackground() {
 async function runNow() {
   const button = el('runNow');
   if (state.staticMode) {
-    el('runStatus').textContent = 'Online fetch is disabled. Use GitHub Actions to run collection.';
+    el('runStatus').textContent = 'Fetch is disabled in read-only mode. Open the desktop app or local server to run collection.';
     return;
   }
   button.disabled = true;

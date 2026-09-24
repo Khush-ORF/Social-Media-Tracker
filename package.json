@@ -7,8 +7,6 @@
     "start": "node app/server.mjs",
     "collect": "node app/collect.mjs --all",
     "collect:x": "node app/collect.mjs --platform X",
-    "build:accounts": "node app/build_accounts_from_profiles.mjs",
-    "scan:social": "node app/scan_official_social_links.mjs",
     "sync:sqlite": "node app/sync_sqlite.mjs",
     "export:public": "node app/export_public_data.mjs",
     "build:static": "node app/sync_sqlite.mjs && node app/export_public_data.mjs"
