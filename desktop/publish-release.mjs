@@ -21,9 +21,8 @@ async function api(route, options = {}) {
   return response.json();
 }
 const repository = await api('');
-if (!repository.permissions?.push) throw new Error('The authenticated account does not have write access to this repository.');
 if (!process.argv.includes('--publish')) {
-  console.log(JSON.stringify({ repository: repository.full_name, canPublish: true }));
+  console.log(JSON.stringify({ repository: repository.full_name, canPublish: Boolean(repository.permissions?.push) }));
 } else {
   const tag = `v${pkg.version}`;
   const filename = `Social-Follower-Tracker-${pkg.version}-Windows-x64.exe`;
