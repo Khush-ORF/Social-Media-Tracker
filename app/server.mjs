@@ -113,6 +113,11 @@ async function routeApi(req, res, url) {
   if (url.pathname === '/api/run-status') {
     return sendJson(res, 200, { ok: true, running: Boolean(running), status: lastRun });
   }
+  if (url.pathname === '/api/shutdown' && req.method === 'POST' && process.env.TRACKER_ALLOW_SHUTDOWN === 'true') {
+    await sendJson(res, 202, { ok: true });
+    setTimeout(() => server.close(() => process.exit(0)), 50);
+    return;
+  }
   if (url.pathname === '/api/download/snapshots.csv') {
     try {
       const csv = await fs.readFile(SNAPSHOTS_CSV);
@@ -217,9 +222,10 @@ const server = http.createServer(async (req, res) => {
 });
 
 await fs.mkdir(DATA_DIR, { recursive: true });
-server.listen(PORT, HOST, () => {
+server.listen(PORT, HOST, async () => {
   const displayHost = HOST === '0.0.0.0' ? '127.0.0.1' : HOST;
   const url = `http://${displayHost}:${server.address().port}`;
+  if (process.env.TRACKER_READY_FILE) await fs.writeFile(process.env.TRACKER_READY_FILE, url, 'utf8');
   console.log(`Local follower tracker: ${url}`);
   process.send?.({ type: 'ready', url });
 });

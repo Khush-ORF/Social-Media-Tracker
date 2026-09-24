@@ -64,7 +64,8 @@ async function fetchRendered(url, platform) {
   } catch {
     throw new Error('Playwright unavailable');
   }
-  const browser = await chromium.launch({ headless: true });
+  const browserOptions = process.env.TRACKER_BROWSER_CHANNEL ? { channel: process.env.TRACKER_BROWSER_CHANNEL } : {};
+  const browser = await chromium.launch({ headless: true, ...browserOptions });
   try {
     const page = await browser.newPage({
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36',

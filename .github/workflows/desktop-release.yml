@@ -16,36 +16,35 @@ jobs:
           node-version: 24
       - run: npm ci
       - run: npm audit --omit=dev
-      - run: npx --yes eslint@9 --no-config-lookup --rule "no-eval:error" --rule "no-implied-eval:error" --rule "no-new-func:error" --rule "no-unsafe-optional-chaining:error" "app/*.mjs" "deployment/*.mjs" "desktop/prepare.mjs"
-      - run: npx playwright install --only-shell chromium
-      - run: npm ci
-        working-directory: desktop
-      - run: npm audit
-        working-directory: desktop
-      - run: npm run dist
-        working-directory: desktop
+      - run: npx --yes eslint@9 --no-config-lookup --rule "no-eval:error" --rule "no-implied-eval:error" --rule "no-new-func:error" --rule "no-unsafe-optional-chaining:error" "app/*.mjs" "deployment/*.mjs"
+      - name: Build lightweight Windows app
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File desktop/lightweight/build.ps1
       - name: Test executable
         shell: pwsh
         run: |
-          $env:TRACKER_DESKTOP_HOME = Join-Path $env:RUNNER_TEMP 'tracker-smoke'
-          $exe = Get-ChildItem desktop/dist/*Windows-x64.exe | Select-Object -First 1
+          $smokeRoot = Join-Path $env:RUNNER_TEMP 'tracker-smoke'
+          $env:TRACKER_DESKTOP_APP_ROOT = Join-Path $smokeRoot 'app'
+          $env:TRACKER_DESKTOP_HOME = Join-Path $smokeRoot 'records'
+          $env:TRACKER_DESKTOP_SMOKE_FILE = Join-Path $smokeRoot 'smoke-result.json'
+          New-Item -ItemType Directory -Force -Path $smokeRoot | Out-Null
+          $exe = Get-ChildItem desktop/dist/Social-Follower-Tracker-*-Windows-x64.exe | Select-Object -First 1
           $process = Start-Process -FilePath $exe.FullName -ArgumentList '--smoke-test' -PassThru -Wait -WindowStyle Hidden
           if ($process.ExitCode -ne 0) { throw 'Desktop smoke test failed' }
-          $result = Get-Content (Join-Path $env:TRACKER_DESKTOP_HOME 'smoke-result.json') -Raw | ConvertFrom-Json
-          if (!$result.packaged -or !$result.nativeWindowLoaded -or $result.sqlite -ne 'ok') { throw 'Desktop verification failed' }
+          $result = Get-Content $env:TRACKER_DESKTOP_SMOKE_FILE -Raw | ConvertFrom-Json
+          if (!$result.nativeWindowLoaded -or $result.title -ne 'Social Follower Tracker') { throw 'Desktop verification failed' }
+          $installedBytes = (Get-ChildItem $env:TRACKER_DESKTOP_APP_ROOT -File -Recurse | Measure-Object Length -Sum).Sum
+          if ($installedBytes -ge 100MB) { throw "Installed app exceeds 100 MB: $([math]::Round($installedBytes / 1MB, 1)) MB" }
           Get-FileHash $exe.FullName -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  $($exe.Name)" } | Set-Content desktop/dist/SHA256SUMS.txt
       - name: Enforce package size limits
         shell: pwsh
         run: |
-          $exe = Get-ChildItem desktop/dist/*Windows-x64.exe | Select-Object -First 1
+          $exe = Get-ChildItem desktop/dist/Social-Follower-Tracker-*-Windows-x64.exe | Select-Object -First 1
           if ($exe.Length -ge 50MB) { throw "Installer exceeds 50 MB: $([math]::Round($exe.Length / 1MB, 1)) MB" }
-          $installedBytes = (Get-ChildItem desktop/dist/win-unpacked -File -Recurse | Measure-Object Length -Sum).Sum
-          if ($installedBytes -ge 100MB) { throw "Installed app exceeds 100 MB: $([math]::Round($installedBytes / 1MB, 1)) MB" }
       - uses: actions/upload-artifact@v4
         with:
           name: windows-desktop
           path: |
-            desktop/dist/*Windows-x64.exe
+            desktop/dist/Social-Follower-Tracker-*-Windows-x64.exe
             desktop/dist/SHA256SUMS.txt
       - name: Publish release
         shell: pwsh

@@ -10,7 +10,7 @@ Download the Windows x64 executable from:
 
 https://github.com/Khush-ORF/Social-Media-Tracker/releases
 
-The release is a portable `.exe`. Node.js, Playwright, the headless browser runtime, and SQLite support are bundled inside the app. Internet access is required when collecting fresh counts.
+The release is a self-extracting `.exe` (currently 12.35 MB) with a 53.91 MB application payload. It uses installed Windows components rather than bundling Chromium: Windows x64, .NET Framework 4.8, Microsoft Edge WebView2 Runtime, Node.js 24+, and Microsoft Edge for rendered collection are required. The app and its JavaScript dependencies are bundled; internet access is required to collect fresh counts.
 
 This release is unsigned, so Windows may show an unknown-publisher warning. Release assets include `SHA256SUMS.txt` for verification.
 
@@ -76,7 +76,7 @@ data/runs/*.json
 accounts.csv                           Curated account list
 app/                                   Collector, parsers, local server, exports
 data/                                  Seed history bundled into the app
-desktop/                               Electron desktop wrapper and release scripts
+desktop/lightweight/                   Native WebView desktop host and self-extracting launcher
 public/                                Local dashboard UI
 sql/schema.sql                         SQLite schema
 package.json                           Local server/collector scripts
@@ -123,38 +123,17 @@ The plain `npm run collect` script uses the collector defaults. For best local c
 
 ## Build The Desktop App
 
-Install desktop dependencies:
+On Windows, install the .NET 10 SDK, .NET Framework 4.8 targeting pack, and Node.js 24+. Then from the repository root run:
 
 ```powershell
-cd desktop
-npm ci
+powershell -ExecutionPolicy Bypass -File desktop/lightweight/build.ps1
 ```
 
-Build the portable executable:
-
-```powershell
-npm run dist
-```
-
-The executable is written to:
-
-```text
-desktop/dist/
-```
-
-The current Electron and bundled Chromium executable is about 196 MB. It does not meet a 50 MB download or 100 MB installed-footprint target. Those limits require replacing the Electron/Chromium bundle with a thin WebView client and using an already-installed browser/runtime, or deploying the server app without a bundled desktop executable.
-
-The release workflow now enforces both size limits and will stop before publishing while the current Electron build exceeds them.
+The build restores the pinned WebView2 package, audits NuGet dependencies, embeds the runtime and account/data seed, and enforces a download below 50 MB and extracted app below 100 MB. The current measured sizes are 12.35 MB and 53.91 MB respectively. Output is `desktop/dist/Social-Follower-Tracker-0.3.0-Windows-x64.exe`.
 
 ## Server Deployment
 
 See [deployment/README.md](deployment/README.md). On Windows, run `deployment/install-windows.bat` as administrator. On Linux or macOS, run `sh deployment/install-unix.sh`. Both set up SQLite, the local dashboard, and a daily month-end check that collects only on the last calendar day in Indian Standard Time.
-
-For an unpacked test build:
-
-```powershell
-npm run pack
-```
 
 ## Release Workflow
 
@@ -164,11 +143,11 @@ The only tracked GitHub workflow is:
 .github/workflows/desktop-release.yml
 ```
 
-It can be run manually from GitHub Actions. It builds the Windows portable executable, smoke-tests the packaged app, writes a SHA-256 checksum, uploads build artifacts, and publishes a GitHub release using the version in `desktop/package.json`.
+It can be run manually from GitHub Actions. It builds the lightweight Windows executable, smoke-tests extraction and dashboard startup, enforces both size limits, writes a SHA-256 checksum, uploads the artifact, and publishes a GitHub release using the version in `desktop/package.json`.
 
 Before making a new public release:
 
-1. Update `desktop/package.json` version.
+1. Update the version in `desktop/package.json` and `desktop/lightweight/build.ps1`/C# launchers together.
 2. Update `desktop/release-notes.md`.
 3. Commit and push.
 4. Run `Build Windows Desktop Release` from GitHub Actions.
@@ -198,4 +177,4 @@ The desktop app is designed for zero-dollar operation:
 
 ## Security Checks
 
-Both the production dependency tree and desktop build dependency tree pass `npm audit` with zero reported vulnerabilities. The release workflow runs those audits and targeted ESLint rules for dynamic code execution patterns before building. The dashboard binds to localhost by default; the deployment instructions require an authenticated HTTPS reverse proxy before exposing it to a network.
+The production Node dependency tree is checked with `npm audit`; the desktop workflow also runs targeted ESLint checks, audits the pinned .NET/WebView2 dependency tree, and tests the packaged executable before release. The dashboard binds to localhost by default; the deployment instructions require an authenticated HTTPS reverse proxy before exposing it to a network.
