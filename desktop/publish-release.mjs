@@ -25,7 +25,7 @@ if (!process.argv.includes('--publish')) {
   console.log(JSON.stringify({ repository: repository.full_name, canPublish: Boolean(repository.permissions?.push) }));
 } else {
   const tag = `v${pkg.version}`;
-  const filename = `Social-Follower-Tracker-${pkg.version}-Windows-x64.exe`;
+  const filename = `Social-Follower-Tracker-${pkg.version}-Windows-x64-Setup.exe`;
   const binary = await fs.readFile(path.join(directory, 'dist', filename));
   const checksums = `${createHash('sha256').update(binary).digest('hex')}  ${filename}\n`;
   await fs.writeFile(path.join(directory, 'dist/SHA256SUMS.txt'), checksums);

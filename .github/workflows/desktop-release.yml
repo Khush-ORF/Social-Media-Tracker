@@ -24,28 +24,37 @@ jobs:
         working-directory: desktop
       - run: npm run dist
         working-directory: desktop
-      - name: Test executable
+      - name: Install and test application
         shell: pwsh
         run: |
           $env:TRACKER_DESKTOP_HOME = Join-Path $env:RUNNER_TEMP 'tracker-smoke'
-          $exe = Get-ChildItem desktop/dist/*Windows-x64.exe | Select-Object -First 1
-          $process = Start-Process -FilePath $exe.FullName -ArgumentList '--smoke-test' -PassThru -Wait -WindowStyle Hidden
+          $installRoot = Join-Path $env:RUNNER_TEMP 'tracker-install'
+          $installer = Get-ChildItem desktop/dist/*-Setup.exe | Select-Object -First 1
+          $install = Start-Process -FilePath $installer.FullName -ArgumentList @('/S', "/D=$installRoot") -PassThru -Wait -WindowStyle Hidden
+          if ($install.ExitCode -ne 0) { throw 'Silent installer failed' }
+          $exe = Join-Path $installRoot 'Social Follower Tracker.exe'
+          if (!(Test-Path $exe)) { throw 'Installed application executable was not found' }
+          $process = Start-Process -FilePath $exe -ArgumentList '--smoke-test' -PassThru -Wait -WindowStyle Hidden
           if ($process.ExitCode -ne 0) { throw 'Desktop smoke test failed' }
           $result = Get-Content (Join-Path $env:TRACKER_DESKTOP_HOME 'smoke-result.json') -Raw | ConvertFrom-Json
           if (!$result.packaged -or !$result.nativeWindowLoaded -or $result.sqlite -ne 'ok') { throw 'Desktop verification failed' }
-          Get-FileHash $exe.FullName -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  $($exe.Name)" } | Set-Content desktop/dist/SHA256SUMS.txt
-      - name: Report standalone package size
+          $uninstaller = Join-Path $installRoot 'Uninstall Social Follower Tracker.exe'
+          if (!(Test-Path $uninstaller)) { throw 'Uninstaller was not found' }
+          $remove = Start-Process -FilePath $uninstaller -ArgumentList '/S' -PassThru -Wait -WindowStyle Hidden
+          if ($remove.ExitCode -ne 0) { throw 'Silent uninstall failed' }
+          Get-FileHash $installer.FullName -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  $($installer.Name)" } | Set-Content desktop/dist/SHA256SUMS.txt
+      - name: Report installer and installed package size
         shell: pwsh
         run: |
-          $exe = Get-ChildItem desktop/dist/*Windows-x64.exe | Select-Object -First 1
+          $exe = Get-ChildItem desktop/dist/*-Setup.exe | Select-Object -First 1
           $installedBytes = (Get-ChildItem desktop/dist/win-unpacked -File -Recurse | Measure-Object Length -Sum).Sum
-          Write-Host "Standalone download, with Electron, Chromium, Node.js, and tracker: $([math]::Round($exe.Length / 1MB, 1)) MB"
+          Write-Host "Setup installer, with Electron, Chromium, Node.js, and tracker: $([math]::Round($exe.Length / 1MB, 1)) MB"
           Write-Host "Unpacked application footprint: $([math]::Round($installedBytes / 1MB, 1)) MB"
       - uses: actions/upload-artifact@v4
         with:
           name: windows-desktop
           path: |
-            desktop/dist/*Windows-x64.exe
+            desktop/dist/*-Setup.exe
             desktop/dist/SHA256SUMS.txt
       - name: Publish release
         shell: pwsh

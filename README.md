@@ -6,17 +6,17 @@ The app tracks curated public accounts across YouTube, X, LinkedIn, Instagram, a
 
 ## Download
 
-Download the Windows x64 executable from:
+Download the Windows x64 setup installer from:
 
 https://github.com/Khush-ORF/Social-Media-Tracker/releases
 
-The release is a standalone portable `.exe` that bundles Electron, Chromium, Node.js, Playwright, and the tracker. No separate runtime or browser installation is required. Internet access is needed to collect fresh counts. The current build is about 198 MB to download and 728 MB unpacked; Chromium is included for both the desktop UI and rendered collection.
+Run `Social-Follower-Tracker-0.4.0-Windows-x64-Setup.exe` to open the standard setup wizard. It shows progress and lets you choose the installation folder, then creates Start Menu and desktop shortcuts. Electron, Chromium, Node.js, Playwright, and the tracker are bundled, so no separate runtime or browser installation is required. Internet access is needed to collect fresh counts. Chromium is included for both the desktop UI and rendered collection, so the installer and installed application are large.
 
 This release is unsigned, so Windows may show an unknown-publisher warning. Release assets include `SHA256SUMS.txt` for verification.
 
 ## Desktop Use
 
-Run the executable to open the tracker dashboard.
+After setup completes, launch Social Follower Tracker from the Start Menu or desktop shortcut.
 
 The first launch copies the bundled account list and seed dataset into your Windows user data folder:
 
@@ -131,7 +131,7 @@ npm ci
 npm run dist
 ```
 
-The build bundles the tracker runtime and browser into `desktop/dist/Social-Follower-Tracker-0.3.0-Windows-x64.exe`. We have relaxed the previous 50 MB limit to keep the app standalone.
+The build bundles the tracker runtime and browser into `desktop/dist/Social-Follower-Tracker-0.4.0-Windows-x64-Setup.exe`. We have relaxed the previous 50 MB limit to keep the app standalone.
 
 ## Server Deployment
 
@@ -145,7 +145,7 @@ The only tracked GitHub workflow is:
 .github/workflows/desktop-release.yml
 ```
 
-It can be run manually from GitHub Actions. It builds the standalone Windows executable, smoke-tests the app and local database, records package size, writes a SHA-256 checksum, uploads the artifact, and publishes a GitHub release using the version in `desktop/package.json`.
+It can be run manually from GitHub Actions. It builds the Windows setup installer, silently installs it into a temporary directory, smoke-tests the installed app and local database, uninstalls it, records package size, writes a SHA-256 checksum, uploads the artifact, and publishes a GitHub release using the version in `desktop/package.json`.
 
 Before making a new public release:
 
