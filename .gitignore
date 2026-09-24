@@ -7,8 +7,5 @@ sources/
 desktop/build/
 desktop/dist/
 desktop/.cache/
-desktop/lightweight/build/
-desktop/lightweight/**/bin/
-desktop/lightweight/**/obj/
 /deployment/runtime/
 

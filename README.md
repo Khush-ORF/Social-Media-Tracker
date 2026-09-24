@@ -10,7 +10,7 @@ Download the Windows x64 executable from:
 
 https://github.com/Khush-ORF/Social-Media-Tracker/releases
 
-The release is a self-extracting `.exe` (currently 12.35 MB) with a 53.91 MB application payload. It uses installed Windows components rather than bundling Chromium: Windows x64, .NET Framework 4.8, Microsoft Edge WebView2 Runtime, Node.js 24+, and Microsoft Edge for rendered collection are required. The app and its JavaScript dependencies are bundled; internet access is required to collect fresh counts.
+The release is a standalone portable `.exe` that bundles Electron, Chromium, Node.js, Playwright, and the tracker. No separate runtime or browser installation is required. Internet access is needed to collect fresh counts. The current build is about 198 MB to download and 728 MB unpacked; Chromium is included for both the desktop UI and rendered collection.
 
 This release is unsigned, so Windows may show an unknown-publisher warning. Release assets include `SHA256SUMS.txt` for verification.
 
@@ -76,7 +76,7 @@ data/runs/*.json
 accounts.csv                           Curated account list
 app/                                   Collector, parsers, local server, exports
 data/                                  Seed history bundled into the app
-desktop/lightweight/                   Native WebView desktop host and self-extracting launcher
+desktop/                               Electron standalone app and release scripts
 public/                                Local dashboard UI
 sql/schema.sql                         SQLite schema
 package.json                           Local server/collector scripts
@@ -123,13 +123,15 @@ The plain `npm run collect` script uses the collector defaults. For best local c
 
 ## Build The Desktop App
 
-On Windows, install the .NET 10 SDK, .NET Framework 4.8 targeting pack, and Node.js 24+. Then from the repository root run:
+On Windows, install Node.js 24 and the Playwright Chromium headless shell. Then run:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File desktop/lightweight/build.ps1
+cd desktop
+npm ci
+npm run dist
 ```
 
-The build restores the pinned WebView2 package, audits NuGet dependencies, embeds the runtime and account/data seed, and enforces a download below 50 MB and extracted app below 100 MB. The current measured sizes are 12.35 MB and 53.91 MB respectively. Output is `desktop/dist/Social-Follower-Tracker-0.3.0-Windows-x64.exe`.
+The build bundles the tracker runtime and browser into `desktop/dist/Social-Follower-Tracker-0.3.0-Windows-x64.exe`. We have relaxed the previous 50 MB limit to keep the app standalone.
 
 ## Server Deployment
 
@@ -143,11 +145,11 @@ The only tracked GitHub workflow is:
 .github/workflows/desktop-release.yml
 ```
 
-It can be run manually from GitHub Actions. It builds the lightweight Windows executable, smoke-tests extraction and dashboard startup, enforces both size limits, writes a SHA-256 checksum, uploads the artifact, and publishes a GitHub release using the version in `desktop/package.json`.
+It can be run manually from GitHub Actions. It builds the standalone Windows executable, smoke-tests the app and local database, records package size, writes a SHA-256 checksum, uploads the artifact, and publishes a GitHub release using the version in `desktop/package.json`.
 
 Before making a new public release:
 
-1. Update the version in `desktop/package.json` and `desktop/lightweight/build.ps1`/C# launchers together.
+1. Update the version in `desktop/package.json`.
 2. Update `desktop/release-notes.md`.
 3. Commit and push.
 4. Run `Build Windows Desktop Release` from GitHub Actions.
