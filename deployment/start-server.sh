@@ -4,6 +4,7 @@ DEPLOY_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 REPO_ROOT=$(dirname "$DEPLOY_DIR")
 RUNTIME_DIR="$DEPLOY_DIR/runtime"
 NODE_BIN=$(cat "$RUNTIME_DIR/node-path.txt")
+export PLAYWRIGHT_BROWSERS_PATH="$RUNTIME_DIR/browsers"
 mkdir -p "$RUNTIME_DIR/logs"
 if [ -f "$RUNTIME_DIR/server.pid" ] && kill -0 "$(cat "$RUNTIME_DIR/server.pid")" 2>/dev/null; then exit 0; fi
 cd "$REPO_ROOT"

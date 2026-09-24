@@ -8,6 +8,7 @@ New-Item -ItemType Directory -Force -Path (Join-Path $runtimeDir 'logs') | Out-N
 $log = Join-Path $runtimeDir 'logs/collector.log'
 $env:TRACKER_DATA_ROOT = $runtimeDir
 $env:PLAYWRIGHT_BROWSERS_PATH = $config.browserCache
+$env:PATH = "$(Split-Path -Parent $config.node);$env:PATH"
 $env:COLLECT_RENDER = 'true'
 Push-Location $config.repo
 try {

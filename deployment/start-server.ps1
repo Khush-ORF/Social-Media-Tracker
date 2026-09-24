@@ -3,6 +3,7 @@ $runtimeDir = Join-Path $PSScriptRoot 'runtime'
 $config = Get-Content (Join-Path $runtimeDir 'deployment.json') -Raw | ConvertFrom-Json
 $env:TRACKER_DATA_ROOT = $runtimeDir
 $env:PLAYWRIGHT_BROWSERS_PATH = $config.browserCache
+$env:PATH = "$(Split-Path -Parent $config.node);$env:PATH"
 $env:HOST = '127.0.0.1'
 $env:PORT = '4173'
 $log = Join-Path $runtimeDir 'logs/server.log'
