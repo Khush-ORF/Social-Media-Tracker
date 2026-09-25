@@ -12,7 +12,7 @@ desktop/dist-lite/
 desktop/native/bin/
 desktop/native/obj/
 desktop/.cache/
-/deployment/runtime/
+/deployment/
 record-backups/
 data/follower_tracker.sqlite.legacy-*
 data/*
@@ -22,5 +22,4 @@ research/
 work/
 worktrees/
 accounts.csv.backup-*
-/deployment/accounts.csv.backup-*
 

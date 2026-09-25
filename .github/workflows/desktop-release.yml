@@ -26,7 +26,7 @@ jobs:
           node-version: 24
       - run: npm ci
       - run: npm audit
-      - run: npx --yes eslint@9 --no-config-lookup --rule "no-eval:error" --rule "no-implied-eval:error" --rule "no-new-func:error" --rule "no-unsafe-optional-chaining:error" "app/*.mjs" "deployment/*.mjs" "desktop/*.mjs" "desktop/*.cjs" "public/app.js"
+      - run: npx --yes eslint@9 --no-config-lookup --rule "no-eval:error" --rule "no-implied-eval:error" --rule "no-new-func:error" --rule "no-unsafe-optional-chaining:error" "app/*.mjs" "desktop/*.mjs" "desktop/*.cjs" "public/app.js"
       - run: npm ci
         working-directory: desktop
       - run: npm audit
