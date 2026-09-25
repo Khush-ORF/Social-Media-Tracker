@@ -33,10 +33,11 @@ Use `sh deployment/stop-server.sh` to stop the current server process. Edit `dep
 ## Data and Downloads
 
 - `accounts.csv` uses `Name,Website,Facebook,LinkedIn,X,Instagram,Youtube`, one organization per row.
-- SQLite holds the structured account and snapshot tables.
+- SQLite is rebuilt from the audit CSV and contains `dataset_metadata`, `collection_runs`, and five workbook-shaped tables: `Facebook`, `LinkedIn`, `X`, `Instagram`, and `Youtube`. Each platform table has `Name`, `Website`, `Social Media Name`, `Time Collected (IST)`, one `YYYY-MM-DD` count column per collection date, and `Sources`.
 - The dashboard's **Download CSV** exports the latest completed run only.
 - **Download Data Set** creates an Excel workbook with one sheet per platform, all observation dates, and clickable source links.
-- **SQLite** downloads a database copy.
+- **SQLite** downloads a database copy in the same wide shape as the Excel dataset.
+- **Clear records** can remove selected collection runs or the entire dataset. A timestamped backup is written under `record-backups` before deletion; `accounts.csv` is never removed.
 
 The scheduled task keeps no persistent collector process running. It starts Node for the month-end job, writes the run to CSV/JSON and SQLite, refreshes the database, then exits. The dashboard server is a small Node HTTP process.
 

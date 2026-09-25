@@ -84,6 +84,7 @@ export function toCsv(rows, columns) {
 }
 
 const ACCOUNT_PLATFORMS = ['Facebook', 'LinkedIn', 'X', 'Instagram', 'YouTube'];
+export const ACCOUNT_COLUMNS = ['Name', 'Website', 'Facebook', 'LinkedIn', 'X', 'Instagram', 'Youtube'];
 
 function accountId(name, platform) {
   const slug = String(name).normalize('NFKD').replace(/[^\w]+/g, '-').replace(/^-|-$/g, '').toLowerCase();
@@ -100,20 +101,17 @@ function profileUrl(value, platform) {
     LinkedIn: 'https://www.linkedin.com/company/',
     X: 'https://x.com/',
     Instagram: 'https://www.instagram.com/',
-    YouTube: 'https://www.youtube.com/',
+    YouTube: 'https://www.youtube.com/@',
   };
+  if (platform === 'YouTube' && /^UC[\w-]{20,}$/i.test(handle)) return `https://www.youtube.com/channel/${handle}`;
+  if (platform === 'YouTube' && /^(user|channel|c)\//i.test(handle)) return `https://www.youtube.com/${handle}`;
   return `${bases[platform]}${handle}`;
 }
 
 export async function readAccounts() {
+  await ensureAccountsFormat();
   const text = await fs.readFile(ACCOUNTS_FILE, 'utf8');
   const sourceRows = parseCsv(text);
-  if (sourceRows.length && 'platform' in sourceRows[0]) {
-    return sourceRows
-      .filter(row => /^(true|yes|1)$/i.test(String(row.active ?? '').trim()))
-      .map(row => ({ ...row, platform: normalizePlatform(row.platform), profile_url: String(row.profile_url ?? '').trim() }))
-      .filter(row => row.profile_url);
-  }
   return sourceRows.flatMap(row => ACCOUNT_PLATFORMS.flatMap(platform => {
     const url = profileUrl(row[platform] ?? row[platform === 'YouTube' ? 'Youtube' : platform], platform);
     if (!url) return [];
@@ -123,6 +121,89 @@ export async function readAccounts() {
       platform, handle, profile_url: url, active: true, notes: '',
     }];
   }));
+}
+
+function accountField(row, field) {
+  const key = Object.keys(row).find(value => value.trim().toLowerCase() === field.toLowerCase());
+  return key ? String(row[key] ?? '').trim() : '';
+}
+
+function canonicalAccountRows(rows) {
+  const legacy = rows.length && Object.keys(rows[0]).some(key => key.trim().toLowerCase() === 'platform');
+  if (!legacy) return rows.map(row => Object.fromEntries(ACCOUNT_COLUMNS.map(column => [column, accountField(row, column === 'Youtube' ? 'youtube' : column)])));
+
+  const groups = new Map();
+  for (const row of rows) {
+    if (accountField(row, 'active') && !/^(true|yes|1)$/i.test(accountField(row, 'active'))) continue;
+    const name = accountField(row, 'name');
+    const website = accountField(row, 'website');
+    const platform = normalizePlatform(accountField(row, 'platform'));
+    if (!name || !ACCOUNT_PLATFORMS.includes(platform)) continue;
+    const key = `${name}\u0000${website}`;
+    if (!groups.has(key)) groups.set(key, Object.fromEntries(ACCOUNT_COLUMNS.map(column => [column, ''])));
+    const group = groups.get(key);
+    group.Name = name;
+    group.Website ||= website;
+    const column = platform === 'YouTube' ? 'Youtube' : platform;
+    const value = accountField(row, 'profile_url') || accountField(row, 'handle');
+    if (!group[column] && value) group[column] = profileUrl(value, platform);
+  }
+  return [...groups.values()];
+}
+
+export async function readAccountRows() {
+  await ensureAccountsFormat();
+  return parseCsv(await fs.readFile(ACCOUNTS_FILE, 'utf8'));
+}
+
+export async function ensureAccountsFormat() {
+  let source;
+  try { source = await fs.readFile(ACCOUNTS_FILE, 'utf8'); } catch (error) {
+    if (error.code === 'ENOENT') return;
+    throw error;
+  }
+  const parsed = parseCsv(source);
+  const legacy = parsed.length && Object.keys(parsed[0]).some(key => key.trim().toLowerCase() === 'platform');
+  const header = source.replace(/^\uFEFF/, '').split(/\r?\n/, 1)[0].split(',').map(value => value.trim());
+  if (!legacy && header.length === ACCOUNT_COLUMNS.length && header.every((value, index) => value === ACCOUNT_COLUMNS[index])) return;
+
+  const converted = canonicalAccountRows(parsed);
+  const backupBase = `${ACCOUNTS_FILE}.backup-${new Date().toISOString().replace(/[:.]/g, '-')}`;
+  let backup = backupBase;
+  for (let suffix = 1; await fs.access(backup).then(() => true, () => false); suffix++) backup = `${backupBase}-${suffix}`;
+  await fs.copyFile(ACCOUNTS_FILE, backup);
+  const temporary = `${ACCOUNTS_FILE}.migrating`;
+  await fs.writeFile(temporary, toCsv(converted, ACCOUNT_COLUMNS), 'utf8');
+  const validation = parseCsv(await fs.readFile(temporary, 'utf8'));
+  if (validation.length !== converted.length || validation.some(row => !row.Name)) {
+    await fs.rm(temporary, { force: true });
+    throw new Error('Account CSV migration validation failed; the original file was preserved.');
+  }
+  await fs.rename(temporary, ACCOUNTS_FILE);
+}
+
+export async function writeAccountRows(rows) {
+  const normalized = rows.map(row => Object.fromEntries(ACCOUNT_COLUMNS.map(column => {
+    const value = String(row[column] ?? row[column.toLowerCase()] ?? '').trim();
+    if (value.length > 2000) throw new Error(`${column} values must be 2,000 characters or fewer.`);
+    return [column, value];
+  }))).filter(row => row.Name);
+  const temporary = `${ACCOUNTS_FILE}.saving`;
+  await fs.writeFile(temporary, toCsv(normalized, ACCOUNT_COLUMNS), 'utf8');
+  const validation = parseCsv(await fs.readFile(temporary, 'utf8'));
+  if (validation.length !== normalized.length || validation.some(row => !row.Name)) {
+    await fs.rm(temporary, { force: true });
+    throw new Error('Account CSV validation failed; existing records were not changed.');
+  }
+  try {
+    await fs.copyFile(ACCOUNTS_FILE, `${ACCOUNTS_FILE}.backup-${new Date().toISOString().replace(/[:.]/g, '-')}`);
+  } catch (error) { if (error.code !== 'ENOENT') throw error; }
+  await fs.rename(temporary, ACCOUNTS_FILE);
+  return normalized;
+}
+
+export function organizationId(row) {
+  return Buffer.from(`${String(row.name ?? row.Name ?? '').trim()}\u0000${String(row.website ?? row.Website ?? '').trim()}`).toString('base64url');
 }
 
 export function normalizePlatform(value) {
@@ -196,17 +277,29 @@ export function buildLatest(allRows, accounts = null) {
   const latest = new Map();
   for (const row of allRows) {
     if (allowedIds && !allowedIds.has(row.id) && !allowedNames.has(`${row.name}\u0000${row.platform}`)) continue;
-    const key = `${row.id}\u0000${row.platform}`;
+    // Account row IDs can change when accounts.csv is migrated or regenerated.
+    // The organization name and website are the stable identity used by the UI.
+    const key = `${organizationId(row)}\u0000${row.platform}`;
     const current = latest.get(key);
     if (!current || String(row.captured_at) > String(current.captured_at)) latest.set(key, row);
   }
-  return [...latest.values()].sort((a, b) => String(a.name).localeCompare(String(b.name)) || String(a.platform).localeCompare(String(b.platform)));
+  return [...latest.values()].map(row => ({ ...row, org_id: organizationId(row) })).sort((a, b) => String(a.name).localeCompare(String(b.name)) || String(a.platform).localeCompare(String(b.platform)));
+}
+
+export function latestRunAt(rows) {
+  const latestRunId = rows.map(row => String(row.run_id || '')).sort().at(-1) || '';
+  const latestRunRows = rows.filter(row => String(row.run_id || '') === latestRunId);
+  return latestRunRows.reduce((earliest, row) => {
+    const captured = String(row.captured_at || '');
+    return captured && (!earliest || captured < earliest) ? captured : earliest;
+  }, '');
 }
 
 export async function writeLatest(allRows, accounts = null) {
   const rows = buildLatest(allRows, accounts);
+  const latestRunAtValue = latestRunAt(rows);
   await ensureDataDirs();
-  await fs.writeFile(LATEST_JSON, JSON.stringify({ generated_at: new Date().toISOString(), rows }, null, 2), 'utf8');
+  await fs.writeFile(LATEST_JSON, JSON.stringify({ generated_at: new Date().toISOString(), latest_run_at: latestRunAtValue || null, rows }, null, 2), 'utf8');
   return rows;
 }
 

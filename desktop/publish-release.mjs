@@ -22,24 +22,39 @@ async function api(route, options = {}) {
 }
 const repository = await api('');
 if (!process.argv.includes('--publish')) {
-  console.log(JSON.stringify({ repository: repository.full_name, canPublish: Boolean(repository.permissions?.push) }));
+  const releases = await api('/releases');
+  console.log(JSON.stringify({ repository: repository.full_name, canPublish: Boolean(repository.permissions?.push), releases: releases.map(release => ({ tag: release.tag_name, draft: release.draft, url: release.html_url })) }));
 } else {
   const tag = `v${pkg.version}`;
   const filename = `Social-Follower-Tracker-${pkg.version}-Windows-x64-Setup.exe`;
-  const binary = await fs.readFile(path.join(directory, 'dist', filename));
+  const releaseDirectory = path.join(directory, 'dist-electron');
+  const binary = await fs.readFile(path.join(releaseDirectory, filename));
   const checksums = `${createHash('sha256').update(binary).digest('hex')}  ${filename}\n`;
-  await fs.writeFile(path.join(directory, 'dist/SHA256SUMS.txt'), checksums);
+  const expectedChecksum = await fs.readFile(path.join(releaseDirectory, 'SHA256SUMS.txt'), 'utf8');
+  if (checksums.trim() !== expectedChecksum.trim()) throw new Error('Installer does not match the verified SHA256SUMS.txt.');
+  const dirty = spawnSync('git', ['status', '--porcelain', '--untracked-files=no'], { cwd: root, encoding: 'utf8', windowsHide: true });
+  if (dirty.status !== 0 || dirty.stdout.trim()) throw new Error('Commit all tracked source changes before publishing.');
   const commit = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8', windowsHide: true }).stdout.trim();
   const branch = await api('/commits/main');
   if (branch.sha !== commit) throw new Error('Push the tested source commit to main before publishing.');
-  const release = await api('/releases', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ tag_name: tag, target_commitish: commit, name: `Social Follower Tracker ${tag} - Windows Desktop`, body: await fs.readFile(path.join(directory, 'release-notes.md'), 'utf8'), draft: true }) });
+  const releases = await api('/releases');
+  let release = releases.find(item => item.tag_name === tag);
+  if (release && !release.draft) throw new Error(`${tag} is already published. Refusing to overwrite it.`);
+  if (!release) release = await api('/releases', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ tag_name: tag, target_commitish: commit, name: `Social Follower Tracker ${tag} - Windows Desktop`, body: await fs.readFile(path.join(directory, 'release-notes.md'), 'utf8'), draft: true }) });
+  else release = await api(`/releases/${release.id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ target_commitish: commit, body: await fs.readFile(path.join(directory, 'release-notes.md'), 'utf8') }) });
   console.log(JSON.stringify({ draftRelease: release.html_url, id: release.id }));
-  for (const [name, body, type] of [[filename, binary, 'application/octet-stream'], ['SHA256SUMS.txt', checksums, 'text/plain']]) {
+  const verification = await fs.readFile(path.join(directory, 'VERIFICATION.md'));
+  for (const [name, body, type] of [[filename, binary, 'application/octet-stream'], ['SHA256SUMS.txt', checksums, 'text/plain'], ['VERIFICATION.md', verification, 'text/markdown'], ['demo-accounts.csv', await fs.readFile(path.join(directory, 'demo-accounts.csv')), 'text/csv']]) {
+    const previous = release.assets.find(asset => asset.name === name);
+    if (previous) {
+      const response = await fetch(`https://api.github.com/repos/${repo}/releases/assets/${previous.id}`, { method: 'DELETE', headers });
+      if (!response.ok) throw new Error(`Unable to replace draft asset ${name}: ${response.status}`);
+    }
     const response = await fetch(`${release.upload_url.split('{')[0]}?name=${encodeURIComponent(name)}`, { method: 'POST', headers: { ...headers, 'content-type': type }, body });
     if (!response.ok) throw new Error(`Asset upload failed (${response.status}); release remains a draft.`);
     const asset = await response.json();
     console.log(JSON.stringify({ asset: asset.name, bytes: asset.size }));
   }
-  const published = await api(`/releases/${release.id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ draft: false }) });
+  const published = await api(`/releases/${release.id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ draft: false, make_latest: 'true' }) });
   console.log(JSON.stringify({ published: published.html_url, assets: published.assets.map(asset => asset.browser_download_url) }));
 }

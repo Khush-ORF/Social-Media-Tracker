@@ -13,14 +13,23 @@ const smoke = process.argv.includes('--smoke-test');
 app.setPath('userData', process.env.TRACKER_DESKTOP_HOME ? path.resolve(process.env.TRACKER_DESKTOP_HOME) : path.join(app.getPath('appData'), 'Social Follower Tracker'));
 const dataRoot = path.join(app.getPath('userData'), 'records');
 const runtime = app.isPackaged ? path.join(process.resourcesPath, 'runtime') : path.join(__dirname, 'build/runtime');
-const browserPath = app.isPackaged ? path.join(process.resourcesPath, 'browsers') : path.join(__dirname, 'build/browsers');
+let browserPreference = '';
+
+async function loadBrowserPreference() {
+  if (process.env.TRACKER_BROWSER_CHANNEL) return process.env.TRACKER_BROWSER_CHANNEL;
+  const settingsPath = path.join(app.isPackaged ? path.dirname(process.execPath) : __dirname, 'tracker-settings.json');
+  try {
+    const { browser } = JSON.parse(await fs.readFile(settingsPath, 'utf8'));
+    return ['auto', 'edge', 'chrome', 'playwright'].includes(browser) ? browser : 'auto';
+  } catch (error) {
+    if (error.code !== 'ENOENT') console.warn(`Unable to read browser preference: ${error.message}`);
+    return 'auto';
+  }
+}
 
 async function seedRecords() {
   await fs.mkdir(dataRoot, { recursive: true });
   try { await fs.access(path.join(dataRoot, 'accounts.csv')); return; } catch {}
-  for (const folder of ['data']) {
-    await fs.cp(path.join(runtime, folder), path.join(dataRoot, folder), { recursive: true, force: false, errorOnExist: false });
-  }
   await fs.copyFile(path.join(runtime, 'accounts.csv'), path.join(dataRoot, 'accounts.csv'));
 }
 
@@ -29,7 +38,12 @@ function startServer() {
     server = spawn(process.execPath, [path.join(runtime, 'app/server.mjs')], {
       cwd: runtime,
       windowsHide: true,
-      env: { ...process.env, ELECTRON_RUN_AS_NODE: '1', TRACKER_DATA_ROOT: dataRoot, PLAYWRIGHT_BROWSERS_PATH: browserPath, PORT: '0' },
+      env: {
+        ...process.env, ELECTRON_RUN_AS_NODE: '1', TRACKER_DATA_ROOT: dataRoot,
+        TRACKER_BROWSER_CHANNEL: browserPreference === 'playwright' ? '' : browserPreference,
+        ...(browserPreference === 'playwright' ? { PLAYWRIGHT_BROWSERS_PATH: path.join(process.resourcesPath, 'browsers') } : {}),
+        PORT: '0',
+      },
       stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
     });
     const timer = setTimeout(() => reject(new Error('The local tracker did not start in time.')), 30000);
@@ -101,46 +115,49 @@ async function stopServer() {
 }
 
 async function runSmokeTest() {
-  process.env.PLAYWRIGHT_BROWSERS_PATH = browserPath;
-  const { chromium } = require(path.join(runtime, 'node_modules/playwright'));
-  if (process.argv.includes('--smoke-collect')) {
-    await new Promise((resolve, reject) => {
-      const child = spawn(process.execPath, [path.join(runtime, 'app/collect.mjs'), '--ids', '001-youtube,001-x,001-linkedin,001-instagram,001-facebook', '--render', '--concurrency', '2'], {
-        cwd: runtime, windowsHide: true,
-        env: { ...process.env, ELECTRON_RUN_AS_NODE: '1', TRACKER_DATA_ROOT: dataRoot, PLAYWRIGHT_BROWSERS_PATH: browserPath },
-        stdio: ['ignore', 'pipe', 'pipe'],
-      });
-      let output = '';
-      child.stdout.on('data', chunk => { output += chunk; });
-      child.stderr.on('data', chunk => { output += chunk; });
-      child.once('error', reject);
-      child.once('close', async code => {
-        await fs.writeFile(path.join(app.getPath('userData'), 'smoke-collection.log'), output);
-        if (code === 0) resolve(); else reject(new Error(`Packaged collection failed (${code}): ${output.slice(-2000)}`));
-      });
-    });
-  }
-  const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage();
-  await page.goto(serverUrl);
-  await page.waitForFunction(() => document.querySelectorAll('#latestRows tr').length > 10);
-  const result = await page.evaluate(() => ({ title: document.title, rows: document.querySelectorAll('#latestRows tr').length, fetchButton: document.querySelector('#runNow').textContent }));
-  await page.screenshot({ path: path.join(app.getPath('userData'), 'desktop-preview.png'), fullPage: false });
-  await browser.close();
+  const smokePayload = await window.webContents.executeJavaScript(`(async () => {
+    const deadline = Date.now() + 10000;
+    while (Date.now() < deadline && !document.querySelector('#launchAccountMeta')?.textContent.includes('2 organizations')) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    const initial = {
+      title: document.title,
+      launchVisible: getComputedStyle(document.querySelector('#launchPanel')).display !== 'none',
+      dashboardVisible: getComputedStyle(document.querySelector('#appShell')).display !== 'none',
+      accountMeta: document.querySelector('#launchAccountMeta')?.textContent.trim(),
+      runMeta: document.querySelector('#launchRunMeta')?.textContent.trim(),
+      latestRows: document.querySelectorAll('#latestRows tr').length,
+    };
+    document.querySelector('#launchFetcher')?.click();
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return { initial, dashboard: {
+      visible: getComputedStyle(document.querySelector('#appShell')).display !== 'none',
+      organizations: document.querySelector('#headerOrgMeta')?.textContent.trim(),
+      targets: document.querySelector('#targetSummary')?.textContent.trim(),
+      fetchButton: document.querySelector('#runNow')?.textContent.trim(),
+    }};
+  })()`);
+  const result = typeof smokePayload === 'string' ? JSON.parse(smokePayload) : smokePayload;
   const latest = await fetch(`${serverUrl}/api/latest`).then(res => res.json());
-  const db = new (require('node:sqlite').DatabaseSync)(path.join(dataRoot, 'data/follower_tracker.sqlite'));
-  result.sqlite = db.prepare('PRAGMA integrity_check').get().integrity_check;
-  db.close();
   result.accounts = latest.rows.length;
   result.snapshots = (await fetch(`${serverUrl}/api/snapshots`).then(res => res.json())).rows.length;
   result.packaged = app.isPackaged;
   result.nativeWindowLoaded = window.webContents.getURL() === `${serverUrl}/`;
-  result.sample = latest.rows.filter(row => row.id.startsWith('001-')).map(({ id, status, count, captured_at, fetch_method }) => ({ id, status, count, captured_at, fetch_method }));
+  result.historyPathExists = await fs.access(path.join(dataRoot, 'data', 'snapshots.csv')).then(() => true, () => false);
   result.dataRoot = dataRoot;
+  result.browserPreference = browserPreference;
+  result.packagedHistoryExists = await fs.access(path.join(runtime, 'public', 'data')).then(() => true, () => false);
+  result.passed = result.initial.launchVisible && !result.initial.dashboardVisible && result.dashboard.visible
+    && result.initial.accountMeta.includes('2 organizations') && result.snapshots === 0 && !result.packagedHistoryExists;
+  if (process.argv.includes('--smoke-workflows')) {
+    if (!process.env.TRACKER_DESKTOP_HOME) throw new Error('Workflow testing requires an isolated TRACKER_DESKTOP_HOME.');
+    try { result.workflows = await require('./smoke-ui.cjs')(window); }
+    catch (error) { result.passed = false; result.workflowError = error.stack || error.message; }
+  }
   await fs.writeFile(path.join(app.getPath('userData'), 'smoke-result.json'), JSON.stringify(result, null, 2));
   quitting = true;
   await stopServer();
-  app.quit();
+  app.exit(result.passed ? 0 : 1);
 }
 
 if (!app.requestSingleInstanceLock()) app.quit();
@@ -148,9 +165,10 @@ else {
   app.on('second-instance', () => { if (window) { window.restore(); window.focus(); } });
   app.whenReady().then(async () => {
     await seedRecords();
+    browserPreference = await loadBrowserPreference();
     await startServer();
     createMenu();
-    window = new BrowserWindow({ show: !smoke, width: 1440, height: 940, minWidth: 880, minHeight: 600, title: 'Social Follower Tracker', backgroundColor: '#ffffff', webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true } });
+    window = new BrowserWindow({ show: !smoke, width: 1440, height: 940, minWidth: 880, minHeight: 600, title: 'Social Follower Tracker', backgroundColor: '#ffffff', webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: false } });
     window.webContents.on('did-fail-load', (_event, code, description, url, mainFrame) => {
       console.error(`Renderer load failed (${code}, mainFrame=${mainFrame}): ${description} ${url}`);
       fs.appendFile(path.join(dataRoot, 'desktop.log'), `Renderer load failed (${code}, mainFrame=${mainFrame}): ${description} ${url}\n`).catch(() => {});

@@ -2,62 +2,71 @@ name: Build Windows Desktop Release
 
 on:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish a new version from main after successful checks
+        type: boolean
+        default: false
 
 permissions:
   contents: write
 
+concurrency:
+  group: desktop-release
+  cancel-in-progress: false
+
 jobs:
   windows:
     runs-on: windows-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
       - run: npm ci
-      - run: npm audit --omit=dev
-      - run: npx --yes eslint@9 --no-config-lookup --rule "no-eval:error" --rule "no-implied-eval:error" --rule "no-new-func:error" --rule "no-unsafe-optional-chaining:error" "app/*.mjs" "deployment/*.mjs" "desktop/prepare.mjs"
-      - run: npx playwright install --only-shell chromium
+      - run: npm audit
+      - run: npx --yes eslint@9 --no-config-lookup --rule "no-eval:error" --rule "no-implied-eval:error" --rule "no-new-func:error" --rule "no-unsafe-optional-chaining:error" "app/*.mjs" "deployment/*.mjs" "desktop/*.mjs" "desktop/*.cjs" "public/app.js"
       - run: npm ci
         working-directory: desktop
       - run: npm audit
         working-directory: desktop
       - run: npm run dist
         working-directory: desktop
-      - name: Install and test application
+      - name: Install and test fresh application
         shell: pwsh
         run: |
           $env:TRACKER_DESKTOP_HOME = Join-Path $env:RUNNER_TEMP 'tracker-smoke'
-          $installRoot = Join-Path $env:RUNNER_TEMP 'tracker-install'
-          $installer = Get-ChildItem desktop/dist/*-Setup.exe | Select-Object -First 1
-          $install = Start-Process -FilePath $installer.FullName -ArgumentList @('/S', "/D=$installRoot") -PassThru -Wait -WindowStyle Hidden
+          $installRoot = Join-Path $env:LOCALAPPDATA 'Programs/SocialFollowerTracker-CI'
+          $installer = Get-ChildItem desktop/dist-electron/*-Setup.exe | Select-Object -First 1
+          $install = Start-Process -FilePath $installer.FullName -ArgumentList ('/S /currentuser /D=' + $installRoot) -PassThru -Wait -WindowStyle Hidden
           if ($install.ExitCode -ne 0) { throw 'Silent installer failed' }
+          $settings = Join-Path $installRoot 'tracker-settings.json'
+          $deadline = (Get-Date).AddMinutes(2)
+          while (!(Test-Path $settings) -and (Get-Date) -lt $deadline) { Start-Sleep -Seconds 1 }
+          if (!(Test-Path $settings)) { throw 'Installer did not finish' }
           $exe = Join-Path $installRoot 'Social Follower Tracker.exe'
-          if (!(Test-Path $exe)) { throw 'Installed application executable was not found' }
           $process = Start-Process -FilePath $exe -ArgumentList '--smoke-test' -PassThru -Wait -WindowStyle Hidden
           if ($process.ExitCode -ne 0) { throw 'Desktop smoke test failed' }
           $result = Get-Content (Join-Path $env:TRACKER_DESKTOP_HOME 'smoke-result.json') -Raw | ConvertFrom-Json
-          if (!$result.packaged -or !$result.nativeWindowLoaded -or $result.sqlite -ne 'ok') { throw 'Desktop verification failed' }
+          if (!$result.passed -or !$result.packaged -or !$result.nativeWindowLoaded -or $result.snapshots -ne 0) { throw 'Fresh desktop verification failed' }
           $uninstaller = Join-Path $installRoot 'Uninstall Social Follower Tracker.exe'
-          if (!(Test-Path $uninstaller)) { throw 'Uninstaller was not found' }
-          $remove = Start-Process -FilePath $uninstaller -ArgumentList '/S' -PassThru -Wait -WindowStyle Hidden
+          $remove = Start-Process -FilePath $uninstaller -ArgumentList '/S','/currentuser' -PassThru -Wait -WindowStyle Hidden
           if ($remove.ExitCode -ne 0) { throw 'Silent uninstall failed' }
-          Get-FileHash $installer.FullName -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  $($installer.Name)" } | Set-Content desktop/dist/SHA256SUMS.txt
-      - name: Report installer and installed package size
-        shell: pwsh
-        run: |
-          $exe = Get-ChildItem desktop/dist/*-Setup.exe | Select-Object -First 1
-          $installedBytes = (Get-ChildItem desktop/dist/win-unpacked -File -Recurse | Measure-Object Length -Sum).Sum
-          Write-Host "Setup installer, with Electron, Chromium, Node.js, and tracker: $([math]::Round($exe.Length / 1MB, 1)) MB"
-          Write-Host "Unpacked application footprint: $([math]::Round($installedBytes / 1MB, 1)) MB"
+          $hash = (Get-FileHash $installer.FullName -Algorithm SHA256).Hash.ToLower()
+          "$hash  $($installer.Name)" | Set-Content desktop/dist-electron/SHA256SUMS.txt -Encoding utf8NoBOM
+          $bytes = (Get-ChildItem desktop/dist-electron/win-unpacked -File -Recurse | Measure-Object Length -Sum).Sum
+          Write-Host "Installer: $([math]::Round($installer.Length / 1MB, 1)) MiB; installed: $([math]::Round($bytes / 1MB, 1)) MiB"
+          Copy-Item desktop/VERIFICATION.md desktop/dist-electron/VERIFICATION.md
       - uses: actions/upload-artifact@v4
         with:
           name: windows-desktop
           path: |
-            desktop/dist/*-Setup.exe
-            desktop/dist/SHA256SUMS.txt
+            desktop/dist-electron/*-Setup.exe
+            desktop/dist-electron/SHA256SUMS.txt
+            desktop/dist-electron/VERIFICATION.md
       - name: Publish release
-        shell: pwsh
+        if: inputs.publish && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: node desktop/publish-release.mjs --publish

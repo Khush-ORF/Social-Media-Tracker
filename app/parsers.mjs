@@ -74,6 +74,8 @@ export function parseMetric(platform, html) {
       const value = jsonCount.replace(/\s*subscribers?.*/i, '');
       return metric(value, 'Subscribers');
     }
+    const embeddedCount = html.match(/"(?:content|accessibilityLabel)"\s*:\s*"([0-9][0-9.,]*\s*[KMB]?)\s+subscribers?"/i)?.[1];
+    if (embeddedCount) return metric(embeddedCount.replace(/\s*subscribers?$/i, ''), 'Subscribers');
     return findNearLabel(text, ['subscribers', 'subscriber']);
   }
 

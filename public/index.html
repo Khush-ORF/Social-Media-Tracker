@@ -3,68 +3,51 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Social Follower Tracker</title>
+  <title>Social Follower Tracker | Public Follower Counts</title>
+  <meta name="description" content="Track public follower and subscriber counts for YouTube, X, LinkedIn, Instagram, and Facebook.">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="topbar">
-    <div>
-      <h1>Social Follower Tracker</h1>
-      <p id="subtitle">Local public-count snapshots</p>
+  <section class="launch-screen" id="launchPanel" aria-labelledby="launchTitle">
+    <main class="launch-content">
+      <div class="press-rule" aria-hidden="true"></div>
+      <div class="launch-meta"><span id="launchAccountMeta">accounts.csv · loading organizations</span><span id="launchRunMeta">Latest run loading</span><span id="launchDbMeta">Local database</span></div>
+      <h1 id="launchTitle">Social Follower Tracker</h1>
+      <div class="launch-actions">
+        <div class="launch-row"><button class="btn btn-primary launch-button" id="launchFetcher">Fetch counts</button><div><strong>Open the dashboard ready to collect.</strong><span>Fresh public counts are only fetched after you press Fetch counts.</span></div></div>
+        <div class="launch-row"><button class="btn btn-secondary launch-button" id="launchAccounts">Edit accounts</button><div><strong>Add, correct or remove organizations.</strong><span>One row per organization with a website and social profile links or handles.</span></div></div>
+        <div class="launch-row"><button class="btn btn-secondary launch-button" id="launchPaste">Add social links</button><div><strong>Import profile links or handles in bulk.</strong><span>Review detected platforms before anything is saved to accounts.csv.</span></div></div>
+      </div>
+    </main>
+  </section>
+
+  <div id="appShell" hidden>
+    <header class="app-header">
+      <div class="header-brand"><button class="brand-link" id="backToLaunch" title="Back to the opening screen">Social Follower Tracker</button><div class="header-meta"><span id="subtitle">Latest run loading</span><span id="headerOrgMeta">0 organizations</span><span id="headerSelectionMeta">All organizations</span><span class="db-state"><i id="dbDot" aria-hidden="true"></i><span id="headerDbMeta">Local database</span></span></div></div>
+      <div class="header-actions"><button id="toggleSelectionPanel" class="btn btn-icon panel-toggle" aria-expanded="true" title="Show or hide organizations panel" aria-label="Show or hide organizations panel">☰</button><button id="runNow" class="btn btn-primary">Fetch now</button><button id="openAccounts" class="btn btn-secondary">Edit accounts</button><button id="openPaste" class="btn btn-secondary">Add links</button><div class="menu-wrap"><button id="exportToggle" class="btn btn-secondary" aria-expanded="false">Export <span aria-hidden="true">⌄</span></button><div class="menu" id="exportMenu" role="menu" hidden><a role="menuitem" href="api/download/current-run.csv"><strong>Current run CSV</strong><span>Only the latest collection run.</span></a><a role="menuitem" href="api/download/dataset.xlsx"><strong>Excel dataset</strong><span>Five platform sheets with date columns.</span></a><a role="menuitem" href="api/download/database.sqlite"><strong>SQLite database</strong><span>Wide platform tables plus run metadata.</span></a></div></div><button id="clearRecords" class="btn btn-secondary danger-button">Clear records</button></div>
+      <div class="header-progress"><span id="headerProgressBar"></span></div>
+    </header>
+
+    <div class="dashboard-grid" id="dashboardGrid">
+      <aside class="selection-panel" id="selectionPanel"><div class="panel-title"><div><h2>Organizations</h2><p>Choose which accounts to display or fetch.</p></div><span id="selectedCount" class="selection-count">All</span></div><input id="accountSearch" class="input" type="search" placeholder="Search organizations" aria-label="Search organizations"><div class="selection-actions"><button id="selectVisible" class="btn btn-ghost">Select visible</button><button id="clearSelected" class="btn btn-ghost">Clear selection</button></div><p id="accountMessage" class="panel-note" role="status"></p><div class="selection-list" id="selectionList"></div><button id="openAccountEditor" class="btn btn-ghost">Open account editor</button></aside>
+
+      <main class="dashboard-main">
+        <section class="collection-section"><h6>Collection</h6><div class="collection-controls"><div class="field"><label for="runScope">Fetch scope</label><select id="runScope" class="input"><option value="all">Entire accounts.csv</option><option value="selected">Selected organizations</option></select></div><div class="field"><label for="runPlatform">Fetch platform</label><select id="runPlatform" class="input"><option value="">All platforms</option><option>YouTube</option><option>LinkedIn</option><option>X</option><option>Instagram</option><option>Facebook</option></select></div><div class="field"><label for="runMode">Fetch mode</label><select id="runMode" class="input"><option value="hybrid">Hybrid automatic</option><option value="complete">Completeness mode</option><option value="static">Static-only diagnostic</option></select></div></div><p id="modeDescription" class="collection-note">Hybrid automatic: static requests first, with browser fallback only when needed.</p><p id="targetSummary" class="panel-note"></p><p id="runStatus" class="run-status" role="status">Idle</p><section id="runProgress" class="progress-panel" hidden aria-live="polite"><div class="progress-heading"><strong id="progressTitle">Collection in progress</strong><span id="progressMeta"></span><button id="dismissRun" class="btn btn-ghost" hidden>Dismiss</button></div><div class="progress-track"><span id="progressBar"></span></div><div class="progress-stats"><span><small>Status</small><strong id="progressState">Collecting</strong></span><span><small>Completed</small><strong id="progressCompleted">0 / 0</strong></span><span><small>Collected</small><strong id="progressCollected">0</strong></span><span><small>Missing</small><strong id="progressMissing">0</strong></span><span><small>Failed</small><strong id="progressFailed">0</strong></span><span><small>Elapsed</small><strong id="progressElapsed">0s</strong></span></div><p id="progressActivity" class="panel-note"></p></section></section>
+
+        <section class="display-section"><h6>Display</h6><div class="filter-controls"><div class="field search-field"><label for="search">Search</label><input id="search" class="input" type="search" placeholder="Name, website, handle or URL"></div><div class="field"><label for="displayPlatform">Display platform</label><select id="displayPlatform" class="input"><option value="">All platforms</option><option>YouTube</option><option>LinkedIn</option><option>X</option><option>Instagram</option><option>Facebook</option></select></div><div class="field"><label for="statusFilter">Status</label><select id="statusFilter" class="input"><option value="">All statuses</option><option value="collected">Collected</option><option value="count_not_found">Count not found</option><option value="failed">Failed</option></select></div><div class="field history-filter"><label for="dateFrom">From</label><select id="dateFrom" class="input"><option value="">Earliest</option></select></div><div class="field history-filter"><label for="dateTo">To</label><select id="dateTo" class="input"><option value="">Latest</option></select></div><label class="checkbox-field"><input id="missingOnly" type="checkbox"> Only organizations with missing values</label><button id="clearFilters" class="btn btn-ghost" disabled>Clear filters</button></div><div class="display-meta"><span id="visibleSummary">0 organizations</span><span id="collectedSummary" class="tag tag-accent">0 collected</span><span id="missingSummary" class="tag tag-neutral">0 count not found</span><span id="failedSummary" class="tag tag-accent-2">0 failed</span><div class="view-tabs" role="tablist" aria-label="View"><button id="viewLatest" role="tab" aria-selected="true">Latest data</button><button id="viewHistory" role="tab" aria-selected="false">History</button></div><div class="segment history-layout" id="historyLayout" hidden role="radiogroup" aria-label="History layout"><label><input type="radio" name="historyLayout" id="historyMatrix" checked>Matrix</label><label><input type="radio" name="historyLayout" id="historyRowsView">Rows</label></div></div></section>
+
+        <section id="latestPanel" class="data-table-panel"><div class="empty-state" id="latestEmpty" hidden><h3>No collection records yet.</h3><p>Run the fetcher to create the first dataset.</p><button class="btn btn-primary" id="emptyRun">Fetch now</button></div><div class="table-scroll" id="latestTableWrap"><table class="data-table latest-table"><thead id="latestHead"></thead><tbody id="latestRows"></tbody></table></div></section>
+        <section id="historyMatrixPanel" class="data-table-panel" hidden><div class="table-scroll"><table class="data-table history-matrix"><thead id="historyMatrixHead"></thead><tbody id="historyMatrixRows"></tbody></table></div><p class="table-note">Blank cells mean the count was not found, the request failed, or the platform was not part of that run. Earlier values are never carried forward.</p></section>
+        <section id="historyRowsPanel" class="data-table-panel" hidden><div class="table-scroll"><table class="data-table history-rows"><thead><tr><th>Date</th><th>Organization</th><th>Platform</th><th>Count</th><th>Status</th><th>Raw text</th><th>Source</th></tr></thead><tbody id="historyRows"></tbody></table></div></section>
+      </main>
     </div>
-    <div class="actions">
-      <select id="runPlatform" aria-label="Run platform">
-        <option value="">All platforms</option>
-        <option>YouTube</option>
-        <option>X</option>
-        <option>LinkedIn</option>
-        <option>Instagram</option>
-        <option>Facebook</option>
-      </select>
-      <button id="runNow">Run fetch now</button>
-      <a class="button ghost" href="api/download/current-run.csv">Download CSV</a>
-      <a class="button ghost" href="api/download/dataset.xlsx">Download Data Set</a>
-      <a class="button ghost" href="api/download/database.sqlite">SQLite</a>
-    </div>
-  </header>
+  </div>
 
-  <main>
-    <section class="stats" id="stats"></section>
-    <section class="run-status" id="runStatus">Idle</section>
+  <section class="page-screen" id="accountPage" hidden aria-labelledby="accountPageTitle"><header class="page-header"><div><button class="btn btn-ghost back-button" id="closeAccountPage">← Dashboard</button><h1 id="accountPageTitle">Edit accounts.csv</h1><p id="editorMessage" class="page-meta">Loading organizations</p></div><div class="page-actions"><button id="addAccount" class="btn btn-secondary">Add organization</button><button id="deleteSelectedAccounts" class="btn btn-secondary danger-text" disabled>Delete selected (0)</button><button id="saveAccounts" class="btn btn-primary">Save accounts.csv</button></div></header><main class="editor-content"><div class="editor-tools"><input id="editorSearch" class="input" type="search" placeholder="Search organizations, websites or handles" aria-label="Search organizations"><button id="selectAllEditor" class="btn btn-ghost">Select all visible</button><button id="clearEditorSelection" class="btn btn-ghost" disabled>Clear selection</button><span>Each social field accepts a full public profile URL or a handle.</span></div><p id="editorError" class="editor-error" role="alert" hidden></p><div class="editor-table-wrap"><table class="data-table editor-table"><thead><tr><th>Select</th><th>Name</th><th>Website</th><th>Facebook</th><th>LinkedIn</th><th>X</th><th>Instagram</th><th>Youtube</th><th></th></tr></thead><tbody id="accountRows"></tbody></table></div></main></section>
 
-    <section class="toolbar">
-      <input id="search" type="search" placeholder="Search accounts">
-      <select id="statusFilter">
-        <option value="">All statuses</option>
-        <option value="collected">Collected</option>
-        <option value="count_not_found">Count not found</option>
-        <option value="failed">Failed</option>
-      </select>
-    </section>
+  <section class="page-screen" id="pastePage" hidden aria-labelledby="pastePageTitle"><header class="page-header"><div><button class="btn btn-ghost back-button" id="closePastePage">← Dashboard</button><h1 id="pastePageTitle">Add social links</h1><p class="page-meta">Paste one public URL or handle per line. Review the detected platform before saving.</p></div></header><main class="paste-content"><section class="paste-input-section"><h6>Paste links</h6><textarea id="pasteInput" class="input" rows="7" placeholder="https://www.linkedin.com/company/example&#10;https://www.instagram.com/example"></textarea><div class="paste-actions"><button id="previewPaste" class="btn btn-secondary">Preview links</button><button id="savePaste" class="btn btn-primary" disabled>Save links</button></div><p id="pasteSummary" class="page-meta">Nothing is saved until you review the detected links.</p></section><section id="pastePreview" class="paste-preview" hidden><h6>Review before saving</h6><div class="table-scroll"><table class="data-table"><thead><tr><th>Include</th><th>Pasted value</th><th>Platform</th><th>Organization</th><th>Detected profile</th><th>Result</th></tr></thead><tbody id="pasteRows"></tbody></table></div></section></main></section>
 
-    <section class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Account</th>
-            <th>YouTube</th>
-            <th>X</th>
-            <th>LinkedIn</th>
-            <th>Instagram</th>
-            <th>Facebook</th>
-            <th>Last captured</th>
-            <th>Source</th>
-          </tr>
-        </thead>
-        <tbody id="latestRows"></tbody>
-      </table>
-    </section>
-
-    <section class="history">
-      <h2>History</h2>
-      <div id="historyRows"></div>
-    </section>
-  </main>
+  <section class="modal-backdrop" id="recordsModal" hidden><div class="dialog wide-dialog" role="dialog" aria-modal="true" aria-labelledby="recordsModalTitle"><div class="dialog-header"><div><h6 class="danger-text">Destructive actions</h6><h2 id="recordsModalTitle">Clear records</h2></div><button class="btn btn-icon" data-close="recordsModal" aria-label="Close">×</button></div><p class="dialog-body">accounts.csv remains unchanged. A timestamped backup is created before records are removed.</p><div id="runList" class="run-list"></div><div class="danger-zone"><h3>Delete selected runs</h3><p>Removes selected runs from history, SQLite, Excel and the dashboard.</p><button id="deleteRuns" class="btn btn-secondary danger-button" disabled>Delete selected runs</button></div><div class="danger-zone"><h3>Delete all records</h3><p>Recreates an empty database. Type DELETE ALL RECORDS to continue.</p><input id="deleteConfirmation" class="input" type="text" placeholder="DELETE ALL RECORDS" autocomplete="off"><button id="deleteAll" class="btn btn-secondary danger-button" disabled>Delete everything</button></div><p id="recordsMessage" class="page-meta" role="status"></p></div></section>
 
   <script src="app.js"></script>
 </body>

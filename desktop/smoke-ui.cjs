@@ -1,0 +1,70 @@
+module.exports = async window => window.webContents.executeJavaScript(`(async () => {
+  const results = {};
+  const element = id => document.getElementById(id);
+  const check = (condition, message) => { if (!condition) throw new Error(message); };
+  const waitFor = async (predicate, message, timeout = 20000) => {
+    const deadline = Date.now() + timeout;
+    while (!predicate()) {
+      if (Date.now() > deadline) throw new Error(message);
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  };
+  const setField = (row, field, value) => {
+    const input = row.querySelector('[data-field="' + field + '"]');
+    input.value = value;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  };
+  const select = (id, value) => {
+    check(!element(id).disabled, id + ' is unexpectedly disabled');
+    element(id).value = value;
+    element(id).dispatchEvent(new Event('change', { bubbles: true }));
+    check(element(id).value === value, id + ' did not retain the selection');
+  };
+  element('openAccounts').click();
+  element('addAccount').click();
+  const first = [...element('accountRows').querySelectorAll('tr[data-org-id]')].at(-1);
+  check([...first.querySelectorAll('.account-value')].every(input => input.value === ''), 'New fields must be empty');
+  setField(first, 'Name', 'Installer QA channel');
+  setField(first, 'Youtube', '@OpenAI');
+  element('saveAccounts').click();
+  await waitFor(() => element('editorMessage').textContent.startsWith('Saved 3 organizations'), 'Account save did not finish');
+  element('closeAccountPage').click();
+  const choice = [...element('selectionList').querySelectorAll('.selection-item')].find(row => row.textContent.includes('Installer QA channel'));
+  check(choice, 'Saved account is missing from the organizations panel');
+  choice.querySelector('input').click();
+  select('runScope', 'selected');
+  select('runPlatform', 'YouTube');
+  select('runMode', 'static');
+  check(element('targetSummary').textContent.includes('1 targets across 1 organizations'), 'Wrong collection target scope');
+  results.selectionControls = true;
+  element('runNow').click();
+  await waitFor(() => element('runStatus').textContent.startsWith('Last run complete'), 'YouTube collection did not complete: ' + element('runStatus').textContent, 90000);
+  await waitFor(() => !element('runMode').disabled && element('latestRows').textContent.includes('Collected'), 'Fresh count did not appear automatically');
+  const latest = await fetch('api/latest').then(response => response.json());
+  const collected = latest.rows.find(row => row.name === 'Installer QA channel' && row.platform === 'YouTube');
+  check(collected?.status === 'collected' && Number(collected.count) > 0, 'No fresh YouTube count');
+  results.youTube = { count: collected.count, precision: collected.count_precision, source: collected.source_url };
+  results.firstRunAutoRefresh = true;
+  select('runMode', 'complete');
+  select('runMode', 'hybrid');
+  select('runScope', 'all');
+  select('runPlatform', 'LinkedIn');
+  results.controlsAfterRun = true;
+  element('clearSelected').click();
+  element('openAccounts').click();
+  element('addAccount').click();
+  const second = [...element('accountRows').querySelectorAll('tr[data-org-id]')].at(-1);
+  setField(second, 'Name', 'Installer QA new account');
+  setField(second, 'Youtube', '@GitHub');
+  element('saveAccounts').click();
+  await waitFor(() => element('editorMessage').textContent.startsWith('Saved 4 organizations'), 'Second account save did not finish');
+  element('closeAccountPage').click();
+  check(element('latestRows').textContent.includes('Installer QA new account'), 'New account was hidden after the first collection');
+  check(element('latestRows').textContent.includes('No record'), 'New account must show a missing record');
+  const accounts = await fetch('api/accounts').then(response => response.json());
+  const saved = accounts.rows.find(row => row.Name === 'Installer QA new account');
+  check(['Website', 'Facebook', 'LinkedIn', 'X', 'Instagram'].every(field => saved[field] === ''), 'Optional blanks were not preserved');
+  results.newAccountsAfterRun = true;
+  results.optionalBlanks = true;
+  return results;
+})()`);

@@ -2,6 +2,7 @@ import ExcelJS from 'exceljs';
 import { toCsv } from './utils.mjs';
 
 const EXPORT_PLATFORMS = ['Facebook', 'LinkedIn', 'X', 'Instagram', 'YouTube'];
+export const DATASET_PLATFORM_TABLES = Object.freeze({ Facebook: 'Facebook', LinkedIn: 'LinkedIn', X: 'X', Instagram: 'Instagram', YouTube: 'Youtube' });
 
 export const CURRENT_RUN_COLUMNS = ['Name', 'Website', 'Time Collected (IST)', 'Facebook', 'LinkedIn', 'X', 'Instagram', 'Youtube', 'Sources'];
 
@@ -64,47 +65,68 @@ export function currentRunCsv(snapshots) {
   return toCsv(output, CURRENT_RUN_COLUMNS);
 }
 
-function dateInIst(value) {
+export function dateInIst(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '';
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
+}
+
+export function platformDatasetRows(snapshots, platform) {
+  const platformRows = snapshots.filter(row => row.platform === platform);
+  const dates = [...new Set(platformRows.map(row => dateInIst(row.captured_at)).filter(Boolean))].sort();
+  const daily = byLatest(platformRows, row => `${row.name}\u0000${row.website || ''}\u0000${dateInIst(row.captured_at)}`);
+  const entities = new Map();
+  for (const row of platformRows) {
+    const key = `${row.name}\u0000${row.website || ''}`;
+    if (!entities.has(key)) entities.set(key, { name: row.name, website: row.website, latest: row, source: row.source_url || row.profile_url });
+    const entity = entities.get(key);
+    if (String(row.captured_at) > String(entity.latest.captured_at)) {
+      entity.latest = row;
+      entity.source = row.source_url || row.profile_url;
+    }
+  }
+  const rows = [...entities.values()].sort((a, b) => String(a.name).localeCompare(String(b.name))).map(entity => {
+    const output = {
+      Name: entity.name,
+      Website: entity.website || '',
+      'Social Media Name': entity.latest.handle || entity.latest.profile_url || '',
+      'Time Collected (IST)': istTime(entity.latest.captured_at),
+      Sources: entity.source || '',
+    };
+    for (const day of dates) {
+      const row = daily.get(`${entity.name}\u0000${entity.website || ''}\u0000${day}`);
+      output[day] = row?.status === 'collected' && row.count !== '' ? Number(row.count) : '';
+    }
+    return output;
+  });
+  return { platform, tableName: DATASET_PLATFORM_TABLES[platform] || platform, dates, rows };
+}
+
+export function datasetTables(snapshots) {
+  return EXPORT_PLATFORMS.map(platform => platformDatasetRows(snapshots, platform));
 }
 
 export async function platformHistoryWorkbook(snapshots) {
   const workbook = new ExcelJS.Workbook();
   workbook.creator = 'Social Follower Tracker';
   workbook.created = new Date();
-  for (const platform of EXPORT_PLATFORMS) {
-    const platformRows = snapshots.filter(row => row.platform === platform);
-    const days = [...new Set(platformRows.map(row => dateInIst(row.captured_at)).filter(Boolean))].sort();
-    const daily = byLatest(platformRows, row => `${row.name}\u0000${row.website || ''}\u0000${dateInIst(row.captured_at)}`);
-    const entities = new Map();
-    for (const row of platformRows) {
-      const key = `${row.name}\u0000${row.website || ''}`;
-      if (!entities.has(key)) entities.set(key, { name: row.name, website: row.website, latest: row, source: row.source_url || row.profile_url });
-      const entity = entities.get(key);
-      if (String(row.captured_at) > String(entity.latest.captured_at)) {
-        entity.latest = row;
-        entity.source = row.source_url || row.profile_url;
-      }
-    }
-    const worksheet = workbook.addWorksheet(platform);
-    const headers = ['Name', 'Website', 'Social Media Name', 'Time Collected (IST)', ...days.map((day, index) => `Follower Count - Date ${index + 1} (${day})`), 'Sources'];
+  for (const table of datasetTables(snapshots)) {
+    const worksheet = workbook.addWorksheet(table.tableName);
+    const headers = ['Name', 'Website', 'Social Media Name', 'Time Collected (IST)', ...table.dates, 'Sources'];
     worksheet.addRow(headers);
-    for (const entity of [...entities.values()].sort((a, b) => String(a.name).localeCompare(String(b.name)))) {
-      const values = [entity.name, entity.website || '', entity.latest.handle || entity.latest.profile_url || '', istTime(entity.latest.captured_at)];
-      for (const day of days) {
-        const row = daily.get(`${entity.name}\u0000${entity.website || ''}\u0000${day}`);
-        values.push(row?.status === 'collected' && row.count !== '' ? Number(row.count) : null);
-      }
-      values.push(entity.source ? { text: 'Source', hyperlink: entity.source } : '');
-      worksheet.addRow(values);
+    for (const entity of table.rows) {
+      worksheet.addRow(headers.map(header => header === 'Sources'
+        ? entity.Sources ? { text: 'Source', hyperlink: entity.Sources } : ''
+        : entity[header] ?? ''));
     }
     worksheet.views = [{ state: 'frozen', ySplit: 1, xSplit: 4 }];
     worksheet.autoFilter = { from: 'A1', to: `${worksheet.getColumn(worksheet.columnCount).letter}1` };
     worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
     worksheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF245B55' } };
-    worksheet.columns.forEach((column, index) => { column.width = index < 3 ? [32, 36, 20][index] : index === 3 ? 24 : index === worksheet.columnCount - 1 ? 14 : 26; });
+    worksheet.columns.forEach((column, index) => {
+      column.width = index < 3 ? [32, 36, 20][index] : index === 3 ? 24 : index === worksheet.columnCount - 1 ? 14 : 18;
+    });
+    worksheet.columns.slice(4, -1).forEach(column => { column.numFmt = '#,##0'; });
     worksheet.eachRow((row, rowNumber) => {
       if (rowNumber === 1) return;
       const source = row.getCell(worksheet.columnCount);

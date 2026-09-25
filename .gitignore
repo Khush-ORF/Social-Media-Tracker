@@ -6,6 +6,21 @@ sources/
 *.log
 desktop/build/
 desktop/dist/
+desktop/dist-electron/
+desktop/build-lite/
+desktop/dist-lite/
+desktop/native/bin/
+desktop/native/obj/
 desktop/.cache/
 /deployment/runtime/
+record-backups/
+data/follower_tracker.sqlite.legacy-*
+data/*
+!data/.gitkeep
+public/data/
+research/
+work/
+worktrees/
+accounts.csv.backup-*
+/deployment/accounts.csv.backup-*
 

@@ -1,16 +1,17 @@
 {
   "name": "social-follower-tracker-desktop",
   "productName": "Social Follower Tracker",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "Local social follower tracker with fresh collection and CSV/SQLite history",
   "author": "Khush-ORF",
   "private": true,
   "main": "main.cjs",
   "scripts": {
-    "prepare:runtime": "node prepare.mjs",
-    "start": "npm run prepare:runtime && electron .",
-    "dist": "npm run prepare:runtime && electron-builder --win nsis --x64 --publish never",
-    "pack": "npm run prepare:runtime && electron-builder --win --x64 --dir --publish never"
+    "start": "npm run start:electron",
+    "dist": "npm run dist:electron",
+    "prepare:electron": "node prepare-electron.mjs",
+    "start:electron": "npm run prepare:electron && electron .",
+    "dist:electron": "npm run prepare:electron && electron-builder --win nsis"
   },
   "devDependencies": {
     "electron": "44.4.5",
@@ -18,15 +19,18 @@
   },
   "build": {
     "appId": "org.khushorf.socialtracker",
-    "directories": { "output": "dist" },
-    "files": ["main.cjs", "package.json"],
+    "compression": "maximum",
+    "afterPack": "verify-package.cjs",
+    "directories": { "output": "dist-electron" },
+    "files": ["main.cjs", "smoke-ui.cjs", "package.json"],
     "extraResources": [
       { "from": "build/runtime", "to": "runtime" },
-      { "from": "build/runtime/node_modules", "to": "runtime/node_modules", "filter": ["**/*"] },
-      { "from": "build/browsers", "to": "browsers" }
+      { "from": "build/runtime/node_modules", "to": "runtime/node_modules" },
+      { "from": "installer/install-browser.ps1", "to": "installer/install-browser.ps1" }
     ],
     "win": { "target": ["nsis"], "signAndEditExecutable": false },
     "nsis": {
+      "include": "installer/browser-options.nsh",
       "artifactName": "Social-Follower-Tracker-${version}-Windows-x64-Setup.exe",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
