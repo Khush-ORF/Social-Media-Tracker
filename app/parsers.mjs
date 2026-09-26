@@ -1,5 +1,7 @@
 import { parseCompactNumber } from './utils.mjs';
 
+// Parsers are the "number finders." They do not fetch pages. They only receive
+// HTML/text and try to pick out the public follower or subscriber count.
 const entityMap = {
   '&amp;': '&',
   '&quot;': '"',
@@ -13,10 +15,13 @@ function decodeHtml(value) {
 }
 
 function stripTags(value) {
+  // Remove scripts, styles, and HTML tags so regexes can look at human text.
   return decodeHtml(String(value ?? '').replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
 }
 
 function metaContent(html, property) {
+  // Many sites put the useful count in meta descriptions, which are easier to
+  // read than the visible page markup.
   const escaped = property.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const re = new RegExp(`<meta[^>]+(?:property|name)=["']${escaped}["'][^>]+content=["']([^"']*)["']`, 'i');
   return decodeHtml(html.match(re)?.[1] ?? '');
@@ -47,6 +52,8 @@ function firstJsonNumber(html, patterns) {
 }
 
 function findNearLabel(text, labels) {
+  // Simple fallback: look for a number close to words like "followers" or
+  // "subscribers". It is conservative so unrelated numbers are less likely.
   for (const label of labels) {
     const after = new RegExp(`([0-9][0-9.,]*\\s*[KMB]?)\\s+${label}\\b`, 'i').exec(text);
     if (after) return metric(after[1], label[0].toUpperCase() + label.slice(1));
@@ -57,6 +64,8 @@ function findNearLabel(text, labels) {
 }
 
 export function parseMetric(platform, html) {
+  // Try platform-specific patterns first because each site names its count a bit
+  // differently. If those fail, the collector records "count not found."
   const metaDescription = metaContent(html, 'og:description') || metaContent(html, 'description');
   const text = `${metaDescription} ${stripTags(html)}`;
 

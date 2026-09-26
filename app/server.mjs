@@ -7,6 +7,8 @@ import { fileURLToPath } from 'node:url';
 import { APP_ROOT, DATA_DIR, HISTORY_MATRIX_CSV, LATEST_JSON, ROOT, RUNS_DIR, SNAPSHOTS_CSV, SNAPSHOT_COLUMNS, buildLatest, latestRunAt, organizationId, readAccounts, readAccountRows, readSnapshots, toCsv, writeAccountRows, writeHistoryMatrix, writeLatest } from './utils.mjs';
 import { currentRunCsv, platformHistoryWorkbook } from './exports.mjs';
 
+// This is the small local web server behind the dashboard. The browser talks to
+// these /api routes; social-media pages are never fetched directly by the UI.
 const PORT = Number(process.env.PORT || 4173);
 const HOST = process.env.HOST || '127.0.0.1';
 const PUBLIC_DIR = path.join(APP_ROOT, 'public');
@@ -46,6 +48,8 @@ async function readBody(req) {
 }
 
 function runCollector({ platform = '', organizationIds = [], mode = 'hybrid', render = false, staticOnly = false } = {}) {
+  // Only one collection run is allowed at a time. The UI can poll lastRun to show
+  // progress while the child process does the slow fetching work.
   if (running) return running;
   const accountsPromise = readAccounts();
   const accountPromise = accountsPromise.then(accounts => {
@@ -119,6 +123,8 @@ function searchMatches(row, query) {
 }
 
 function applyRowFilters(rows, url) {
+  // Server-side filters make downloads and dashboard views agree about selected
+  // organizations, platform, status, and search text.
   const orgIds = new Set((url.searchParams.get('org_ids') || '').split(',').map(value => value.trim()).filter(Boolean));
   const platform = String(url.searchParams.get('platform') || '').trim().toLowerCase();
   const status = String(url.searchParams.get('status') || '').trim().toLowerCase();
@@ -133,6 +139,7 @@ function applyRowFilters(rows, url) {
 }
 
 function runSummaries(rows) {
+  // Records screen needs one compact row per run, not every account/platform row.
   const runs = new Map();
   for (const row of rows) {
     if (!runs.has(row.run_id)) runs.set(row.run_id, {
@@ -154,6 +161,8 @@ function runSummaries(rows) {
 }
 
 async function backupRecords(label) {
+  // Deleting records is reversible from disk: copy the current data files into a
+  // timestamped backup before removing anything.
   const stamp = `${label}-${new Date().toISOString().replace(/[:.]/g, '-')}`;
   const backupDir = path.join(RECORD_BACKUPS_DIR, stamp);
   await fs.mkdir(path.join(backupDir, 'runs'), { recursive: true });
@@ -165,6 +174,8 @@ async function backupRecords(label) {
 }
 
 async function rebuildDerivedData() {
+  // snapshots.csv is the source of truth. After edits/deletes, rebuild every
+  // cache/export that depends on it.
   const snapshots = await readSnapshots();
   await writeHistoryMatrix(snapshots);
   await writeLatest(snapshots, await readAccounts());
@@ -203,6 +214,8 @@ async function deleteAllRecords() {
 }
 
 async function routeApi(req, res, url) {
+  // API routes are intentionally boring JSON/file endpoints so the same server
+  // works in a browser, in Electron, and in tests.
   if (url.pathname === '/api/latest') {
     try {
       const latest = JSON.parse(await fs.readFile(LATEST_JSON, 'utf8'));
@@ -336,6 +349,8 @@ async function routeApi(req, res, url) {
 }
 
 async function routeStatic(req, res, url) {
+  // Static files are served from public/. The path check prevents a URL from
+  // escaping the app folder and reading random files from the computer.
   const requested = url.pathname === '/' ? '/index.html' : decodeURIComponent(url.pathname);
   const baseDir = requested.startsWith('/data/') ? path.join(ROOT, 'public') : PUBLIC_DIR;
   const fullPath = path.resolve(baseDir, `.${requested}`);

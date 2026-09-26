@@ -2,6 +2,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// Shared paths and helpers live here so the collector, server, exports, and
+// desktop app all agree about where records are saved and how CSV is shaped.
 export const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const ROOT = process.env.TRACKER_DATA_ROOT ? path.resolve(process.env.TRACKER_DATA_ROOT) : APP_ROOT;
 export const ACCOUNTS_FILE = path.join(ROOT, 'accounts.csv');
@@ -37,6 +39,8 @@ export async function ensureDataDirs() {
 }
 
 export function parseCsv(text) {
+  // Tiny CSV reader for our own files. It understands commas, quotes, new lines,
+  // and spreadsheet-style doubled quotes.
   const rows = [];
   let row = [];
   let field = '';
@@ -76,6 +80,7 @@ export function parseCsv(text) {
 }
 
 export function toCsv(rows, columns) {
+  // Write columns in a fixed order so Excel and Git diffs stay predictable.
   const quote = value => {
     const text = String(value ?? '');
     return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
@@ -92,6 +97,8 @@ function accountId(name, platform) {
 }
 
 function profileUrl(value, platform) {
+  // Users can type either a full URL or a simple handle. This turns handles into
+  // real public profile URLs before the collector tries to open them.
   const raw = String(value ?? '').trim();
   if (!raw) return '';
   if (/^https?:\/\//i.test(raw)) return raw;
@@ -109,6 +116,8 @@ function profileUrl(value, platform) {
 }
 
 export async function readAccounts() {
+  // The UI stores one wide row per organization. The collector needs one row per
+  // platform, so this expands each organization into collection jobs.
   await ensureAccountsFormat();
   const text = await fs.readFile(ACCOUNTS_FILE, 'utf8');
   const sourceRows = parseCsv(text);
@@ -129,6 +138,8 @@ function accountField(row, field) {
 }
 
 function canonicalAccountRows(rows) {
+  // Older versions used one CSV row per platform. Keep user files working by
+  // converting that old shape into the current wide accounts.csv shape.
   const legacy = rows.length && Object.keys(rows[0]).some(key => key.trim().toLowerCase() === 'platform');
   if (!legacy) return rows.map(row => Object.fromEntries(ACCOUNT_COLUMNS.map(column => [column, accountField(row, column === 'Youtube' ? 'youtube' : column)])));
 
@@ -157,6 +168,8 @@ export async function readAccountRows() {
 }
 
 export async function ensureAccountsFormat() {
+  // If accounts.csv is old or has headers in a different order, rewrite it into
+  // the current format only after making a timestamped backup.
   let source;
   try { source = await fs.readFile(ACCOUNTS_FILE, 'utf8'); } catch (error) {
     if (error.code === 'ENOENT') return;
@@ -183,6 +196,8 @@ export async function ensureAccountsFormat() {
 }
 
 export async function writeAccountRows(rows) {
+  // Save edits safely: write a temporary file, read it back to prove it is valid,
+  // back up the old file, then swap the new file into place.
   const normalized = rows.map(row => Object.fromEntries(ACCOUNT_COLUMNS.map(column => {
     const value = String(row[column] ?? row[column.toLowerCase()] ?? '').trim();
     if (value.length > 2000) throw new Error(`${column} values must be 2,000 characters or fewer.`);
@@ -203,6 +218,8 @@ export async function writeAccountRows(rows) {
 }
 
 export function organizationId(row) {
+  // The same think tank may have five platform rows. Name + website groups those
+  // rows back into one organization in the dashboard.
   return Buffer.from(`${String(row.name ?? row.Name ?? '').trim()}\u0000${String(row.website ?? row.Website ?? '').trim()}`).toString('base64url');
 }
 
@@ -217,6 +234,8 @@ export function normalizePlatform(value) {
 }
 
 export function parseCompactNumber(raw) {
+  // Public pages often say "12.4K" or "1.2M". Turn that text into a number and
+  // remember whether it was exact or rounded by the platform.
   const source = String(raw ?? '').trim();
   const normalized = source
     .replace(/\u00a0/g, ' ')
@@ -243,6 +262,8 @@ export async function readSnapshots() {
 }
 
 export async function appendSnapshots(rows) {
+  // snapshots.csv is the long-term memory: every run appends new rows and keeps
+  // older rows so the dataset can grow over time.
   await ensureDataDirs();
   let existing = '';
   try {
@@ -272,6 +293,8 @@ export async function writeRun(runId, rows) {
 }
 
 export function buildLatest(allRows, accounts = null) {
+  // For the dashboard, keep only the newest row for each organization/platform.
+  // The full history remains in snapshots.csv.
   const allowedIds = accounts ? new Set(accounts.map(account => account.id)) : null;
   const allowedNames = accounts ? new Set(accounts.map(account => `${account.name}\u0000${account.platform}`)) : null;
   const latest = new Map();
@@ -287,6 +310,8 @@ export function buildLatest(allRows, accounts = null) {
 }
 
 export function latestRunAt(rows) {
+  // "Latest run" means the newest run id, then the first timestamp from that run.
+  // This keeps the UI from mixing old successful rows with a newer run label.
   const latestRunId = rows.map(row => String(row.run_id || '')).sort().at(-1) || '';
   const latestRunRows = rows.filter(row => String(row.run_id || '') === latestRunId);
   return latestRunRows.reduce((earliest, row) => {
@@ -309,6 +334,8 @@ function observationDate(row) {
 }
 
 export function buildHistoryMatrix(rows) {
+  // Turn many platform rows into one wide row per organization/date/run. This is
+  // the easy-to-scan shape used by CSV and spreadsheet-style exports.
   const grouped = new Map();
   for (const row of rows) {
     const key = [

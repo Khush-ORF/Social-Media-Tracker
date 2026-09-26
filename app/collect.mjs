@@ -6,6 +6,8 @@ import path from 'node:path';
 import { appendSnapshots, ensureDataDirs, organizationId, readAccounts, readSnapshots, writeHistoryMatrix, writeLatest, writeRun } from './utils.mjs';
 import { parseFromText, parseMetric } from './parsers.mjs';
 
+// This file is the collector: it opens each public profile page, looks for the
+// public follower number, and writes one saved row for every attempted account.
 const require = createRequire(import.meta.url);
 const args = process.argv.slice(2);
 const platformArg = args.includes('--platform') ? args[args.indexOf('--platform') + 1] : '';
@@ -36,6 +38,8 @@ const platformConcurrency = fullMode
     ? { YouTube: 6, X: 0, LinkedIn: 4, Instagram: 1, Facebook: 2 }
     : { YouTube: 8, X: 3, LinkedIn: 6, Instagram: 2, Facebook: 3 };
 
+// Every run gets a time-based name. That name connects the CSV rows, JSON file,
+// SQLite tables, and UI progress display.
 function runIdFor(date = new Date()) {
   return date.toISOString().replace(/[:.]/g, '-').replace('T', '_').slice(0, 23);
 }
@@ -45,6 +49,8 @@ function sleep(ms) {
 }
 
 async function fetchStatic(url) {
+  // First try the cheap path: download the page HTML like a normal web request.
+  // This is fast and avoids opening a browser when the count is already visible.
   let lastError;
   const attempts = fullMode ? 3 : 1;
   const timeoutMs = fullMode ? 35000 : 8000;
@@ -70,6 +76,8 @@ let renderedBrowser;
 let renderedBrowserPromise;
 
 async function getRenderedBrowser() {
+  // Some pages hide the count until JavaScript runs. Playwright gives us a real
+  // headless browser for those pages, and this keeps one browser shared per run.
   if (renderedBrowser) return renderedBrowser;
   if (!renderedBrowserPromise) {
     renderedBrowserPromise = Promise.resolve().then(() => {
@@ -92,6 +100,8 @@ async function closeRenderedBrowser() {
 }
 
 function systemBrowserExecutable(preference = '') {
+  // The installer can use the user's existing Edge/Chrome, so the app stays much
+  // smaller than bundling a whole browser every time.
   const browserRoots = {
     edge: [
       process.env.ProgramFiles && path.join(process.env.ProgramFiles, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
@@ -115,6 +125,8 @@ function systemBrowserExecutable(preference = '') {
 }
 
 async function fetchRenderedWithSystemBrowser(url, preference = '') {
+  // Edge and Chrome both have a --dump-dom mode: open the page invisibly, wait a
+  // moment, then print the finished HTML so the parser can read it.
   const selected = systemBrowserExecutable(preference);
   if (!selected) throw new Error('No supported browser is available. Install Microsoft Edge or Google Chrome, or install Playwright browsers.');
   const profile = mkdtempSync(path.join(os.tmpdir(), 'social-tracker-browser-'));
@@ -144,6 +156,10 @@ async function fetchRenderedWithSystemBrowser(url, preference = '') {
 }
 
 async function fetchRendered(url, platform) {
+  // Browser fallback order:
+  // 1. user's chosen system browser,
+  // 2. Playwright browser if installed,
+  // 3. clear error so the UI shows why that profile could not be collected.
   const channel = String(process.env.TRACKER_BROWSER_CHANNEL || '').toLowerCase();
   if (channel === 'auto' && systemBrowserExecutable()) return fetchRenderedWithSystemBrowser(url);
   if (['msedge', 'edge', 'chrome', 'googlechrome'].includes(channel)) return fetchRenderedWithSystemBrowser(url, channel);
@@ -171,6 +187,8 @@ async function fetchRendered(url, platform) {
 }
 
 async function collectOne(account, runId, pageCache) {
+  // A failed profile still becomes a saved row. That way missing data is visible
+  // in the dashboard instead of silently disappearing.
   const captured_at = new Date().toISOString();
   const base = {
     run_id: runId,
@@ -197,6 +215,8 @@ async function collectOne(account, runId, pageCache) {
   if (renderEnabled) fetchers.push(fetchRendered);
   for (const fetcher of fetchers) {
     try {
+      // If the same page appears more than once in a run, fetch it once and share
+      // the result. This saves time and reduces repeated hits to public sites.
       const cacheKey = `${fetcher.name}:${account.platform}:${account.profile_url}`;
       if (!pageCache.has(cacheKey)) pageCache.set(cacheKey, fetcher(account.profile_url, account.platform));
       const page = await pageCache.get(cacheKey);
@@ -239,6 +259,8 @@ function platformLimit(platform) {
 }
 
 async function collectMany(accounts, runId) {
+  // This is a small traffic controller. It runs several accounts at once, but it
+  // slows down noisy platforms so one site does not block or rate-limit the run.
   if (!accounts.length) return [];
   const rows = new Array(accounts.length);
   const activeByPlatform = new Map();
@@ -297,6 +319,8 @@ async function collectMany(accounts, runId) {
 }
 
 async function main() {
+  // Main flow: choose accounts, collect rows, then rebuild every derived file the
+  // UI and exports read from.
   await ensureDataDirs();
   const requestedPlatform = platformArg ? platformArg.toLowerCase() : '';
   const accounts = (await readAccounts()).filter(row => {

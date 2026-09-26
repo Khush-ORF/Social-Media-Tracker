@@ -1,6 +1,8 @@
 import ExcelJS from 'exceljs';
 import { toCsv } from './utils.mjs';
 
+// Export helpers turn raw snapshot rows into the shapes people actually open:
+// one CSV for the latest run and one Excel workbook for the full dataset.
 const EXPORT_PLATFORMS = ['Facebook', 'LinkedIn', 'X', 'Instagram', 'YouTube'];
 export const DATASET_PLATFORM_TABLES = Object.freeze({ Facebook: 'Facebook', LinkedIn: 'LinkedIn', X: 'X', Instagram: 'Instagram', YouTube: 'Youtube' });
 
@@ -16,10 +18,12 @@ function istTime(value) {
 }
 
 function latestRun(rows) {
+  // Run IDs include the timestamp, so the biggest string is the newest run.
   return rows.reduce((latest, row) => String(row.run_id) > latest ? String(row.run_id) : latest, '');
 }
 
 function byLatest(rows, keyFn) {
+  // When several rows land on the same date, keep the last one collected that day.
   const map = new Map();
   for (const row of rows) {
     const key = keyFn(row);
@@ -30,11 +34,14 @@ function byLatest(rows, keyFn) {
 }
 
 function safeCsvText(value) {
+  // Stop spreadsheet apps from treating user-controlled text as a formula.
   const text = String(value ?? '');
   return /^[\s]*[=+\-@]/.test(text) ? `'${text}` : text;
 }
 
 export function currentRunCsv(snapshots) {
+  // Download CSV shows only the newest run, with one row per organization and one
+  // column per platform.
   const runId = latestRun(snapshots);
   const rows = snapshots.filter(row => String(row.run_id) === runId);
   const groups = new Map();
@@ -72,6 +79,8 @@ export function dateInIst(value) {
 }
 
 export function platformDatasetRows(snapshots, platform) {
+  // Dataset export grows to the right over time: each new collection date becomes
+  // another follower-count column.
   const platformRows = snapshots.filter(row => row.platform === platform);
   const dates = [...new Set(platformRows.map(row => dateInIst(row.captured_at)).filter(Boolean))].sort();
   const daily = byLatest(platformRows, row => `${row.name}\u0000${row.website || ''}\u0000${dateInIst(row.captured_at)}`);
@@ -107,6 +116,8 @@ export function datasetTables(snapshots) {
 }
 
 export async function platformHistoryWorkbook(snapshots) {
+  // Excel gets one sheet per platform. Source URLs become compact clickable
+  // "Source" links so the sheet stays readable.
   const workbook = new ExcelJS.Workbook();
   workbook.creator = 'Social Follower Tracker';
   workbook.created = new Date();

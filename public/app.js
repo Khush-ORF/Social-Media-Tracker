@@ -1,4 +1,6 @@
 const state = {
+  // One place for everything the screen needs. Changing state, then calling
+  // renderAll(), redraws the dashboard from the latest known data.
   latest: [],
   snapshots: [],
   accounts: [],
@@ -42,6 +44,7 @@ function platformShortLabel(platform) { return { Facebook: 'f', LinkedIn: 'in', 
 function statusClass(value) { return escapeAttribute(value || 'none'); }
 
 function sourceIcon(row) {
+  // Show a tiny platform button instead of a long URL, so tables stay narrow.
   const url = row?.source_url || row?.profile_url;
   if (!url) return '';
   const platform = row.platform || 'Source';
@@ -69,6 +72,8 @@ function accountSearchText(account) {
 function currentFilters() { return state.filters; }
 
 function accountMatchesFilters(account, mode = 'latest') {
+  // The left organization choices act like a master filter. Search, platform,
+  // status, date, and missing-only filters stack on top of it.
   const filters = currentFilters();
   const id = organizationId(account);
   if (selectedFilterActive() && !state.selectedOrganizations.has(id)) return false;
@@ -84,6 +89,7 @@ function filteredAccounts(mode = 'latest') { return state.accounts.filter(accoun
 function visiblePlatforms() { return state.filters.displayPlatform ? [state.filters.displayPlatform] : platforms; }
 
 function filteredSnapshots() {
+  // History uses raw snapshot rows. Latest view uses one newest row per platform.
   const filters = currentFilters();
   return state.snapshots.filter(row => {
     const id = organizationId(row);
@@ -100,6 +106,8 @@ function filteredSnapshots() {
 }
 
 function renderMetricCell(account, platform) {
+  // One platform cell can be: not tracked, never collected, collected, or failed.
+  // Keeping all cases visible is important for auditability.
   if (!tracked(account, platform)) return '<td><span class="untracked">Not tracked</span></td>';
   const row = rowFor(account, platform);
   if (!row) return '<td><div class="metric-cell"><span class="count-text">n.a.</span><span class="status none">No record</span><span class="time-text">Not collected yet</span></div></td>';
@@ -116,6 +124,7 @@ function renderSourceCell(rows) {
 }
 
 function renderStats(accounts) {
+  // The small counters at the top summarize only what the current filters show.
   const display = visiblePlatforms();
   const rows = accounts.flatMap(account => display.map(platform => rowFor(account, platform)).filter(Boolean));
   el('visibleSummary').textContent = `${accounts.length} of ${state.accounts.length} organizations`;
@@ -128,6 +137,7 @@ function renderStats(accounts) {
 }
 
 function renderLatest() {
+  // Main dashboard table: one organization per row, platforms across columns.
   const display = visiblePlatforms();
   const accounts = filteredAccounts('latest');
   el('latestEmpty').hidden = state.latest.length > 0;
@@ -156,6 +166,8 @@ function renderDateOptions() {
 }
 
 function renderHistoryMatrix() {
+  // History matrix: one row per organization + platform, dates across columns.
+  // This mirrors the Excel dataset layout.
   const filters = currentFilters();
   const snapshots = filteredSnapshots();
   const accounts = filteredAccounts('history');
@@ -219,6 +231,7 @@ function renderControls() {
 }
 
 function renderAll() {
+  // Redraw every part that can be affected by data, filters, or selections.
   renderDateOptions();
   renderStats(filteredAccounts(state.view === 'latest' ? 'latest' : 'history'));
   renderSelection();
@@ -268,6 +281,8 @@ function renderEditor() {
 async function fetchJson(path, options) { const response = await fetch(path, options); const payload = await response.json().catch(() => ({})); if (!response.ok) throw new Error(payload.error || `Request failed (${response.status})`); return payload; }
 
 async function loadAccounts() {
+  // In the desktop/local app, accounts come from the server. On GitHub Pages,
+  // staticMode skips editing because there is no server to save changes.
   if (state.staticMode) return;
   const payload = await fetchJson('api/accounts');
   state.accounts = payload.rows || [];
@@ -291,6 +306,8 @@ function setHeaderMeta(payload) {
 }
 
 async function load() {
+  // Prefer live local API data. If that fails, fall back to static public JSON so
+  // the published GitHub Pages view can still show exported data.
   let payload;
   try { payload = await fetchJson('api/latest'); state.staticMode = false; } catch { payload = await fetch('data/latest.json').then(response => response.ok ? response.json() : { rows: [] }); state.staticMode = true; }
   state.latest = payload.rows || [];
@@ -319,6 +336,7 @@ function hidePages() { el('appShell').hidden = true; el('launchPanel').hidden = 
 function showApp() { hidePages(); el('appShell').hidden = false; document.body.classList.remove('modal-open'); renderAll(); }
 function goLaunch() { hidePages(); el('launchPanel').hidden = false; }
 function showAccountPage(returnTo = 'dashboard', focusName = '') {
+  // The account editor is a full page so wide rows and long URLs have room.
   state.accountPageReturn = returnTo;
   hidePages();
   el('accountPage').hidden = false;
@@ -339,6 +357,8 @@ function removeAccount(id) { state.selectedOrganizations.delete(id); state.edito
 function deleteSelectedAccounts() { const ids = new Set(state.editorSelected); state.accounts = state.accounts.filter(account => !ids.has(organizationId(account))); state.selectedOrganizations = new Set([...state.selectedOrganizations].filter(id => !ids.has(id))); state.editorSelected.clear(); persistSelection(); renderEditor(); }
 
 async function saveAccounts() {
+  // Only visible editor inputs are read back from the table. Rows not currently
+  // visible keep their existing values.
   const editedById = new Map();
   for (const row of el('accountRows').querySelectorAll('tr[data-org-id]')) { const account = state.accounts.find(candidate => organizationId(candidate) === row.dataset.orgId); if (!account) continue; const edited = { ...account }; for (const input of row.querySelectorAll('.account-value')) edited[input.dataset.field] = input.value.trim(); editedById.set(row.dataset.orgId, edited); }
   const rows = state.accounts.map(account => editedById.get(organizationId(account)) || account).filter(account => accountName(account).trim());
@@ -351,6 +371,8 @@ function normalizePasteValue(value, platform) { const text = value.trim(); if (/
 function pasteLabel(url) { try { const parsed = new URL(url); return parsed.pathname.split('/').filter(Boolean).at(-1)?.replace(/^@/, '') || 'organization'; } catch { return 'organization'; } }
 
 function renderPastePreview() {
+  // Paste import is a helper for quick setup: each pasted URL becomes a proposed
+  // new organization row that the user can review before saving.
   const valid = state.pasteRows.filter(row => row.platform && row.include);
   el('pastePreview').hidden = state.pasteRows.length === 0;
   el('pasteRows').innerHTML = state.pasteRows.map((row, index) => `<tr class="${row.platform ? '' : 'paste-row-invalid'}"><td><input type="checkbox" data-paste-index="${index}" ${row.include ? 'checked' : ''} ${row.platform ? '' : 'disabled'} aria-label="Include pasted link"></td><td>${escapeHtml(row.value)}</td><td>${escapeHtml(row.platform || 'Unrecognized')}</td><td>${escapeHtml(row.name)}</td><td><a href="${escapeAttribute(row.url)}" target="_blank" rel="noreferrer">${escapeHtml(row.url)}</a></td><td>${escapeHtml(row.platform ? 'Ready to save' : 'Choose a recognized public profile URL')}</td></tr>`).join('') || '<tr><td colspan="6" class="muted">Nothing to preview.</td></tr>';
@@ -363,6 +385,8 @@ function previewPaste() { const values = el('pasteInput').value.split(/\r?\n/).m
 async function savePaste() { const valid = state.pasteRows.filter(row => row.platform && row.include); if (!valid.length) return; const additions = valid.map(row => { const field = row.platform === 'Youtube' ? 'Youtube' : row.platform; return { Name: row.name, Website: '', Facebook: '', LinkedIn: '', X: '', Instagram: '', Youtube: '', [field]: row.url }; }); await fetchJson('api/accounts', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ rows: [...state.accounts, ...additions] }) }); state.pasteRows = []; el('pasteInput').value = ''; await load(); el('runStatus').textContent = `Added ${additions.length} profile link${additions.length === 1 ? '' : 's'} to accounts.csv.`; closePastePage(); }
 
 function updateProgress(status, running) {
+  // The server stores a small live status object. This turns it into the progress
+  // bar, counters, and last activity line.
   const total = Number(status.targets || 0); const completed = Number(status.completed || 0); const pct = total ? Math.min(100, completed / total * 100) : 0; const elapsed = status.started_at ? Math.max(0, Math.round((Date.now() - new Date(status.started_at).getTime()) / 1000)) : 0;
   const resultMatches = [...String(status.stdout || '').matchAll(/\.\.\. (collected|count_not_found|failed)(?=\s|$)/gm)].map(match => match[1]);
   const liveCollected = resultMatches.filter(value => value === 'collected').length;
@@ -391,6 +415,7 @@ function renderSelectionDependentViews() {
 }
 
 async function runNow() {
+  // Start collection from the current dropdowns and selected organizations.
   if (state.staticMode) return;
   const scope = el('runScope').value;
   if (scope === 'selected' && !state.selectedOrganizations.size) { el('runStatus').textContent = 'Select at least one organization, or choose the entire accounts.csv.'; return; }
@@ -399,6 +424,7 @@ async function runNow() {
 }
 
 async function pollRunStatus() {
+  // Keep asking the server how the run is going until it says the run ended.
   const button = el('runNow'); button.disabled = true; button.textContent = 'Fetching…'; for (const id of ['runScope', 'runPlatform', 'runMode']) el(id).disabled = true;
   try {
     while (true) { const payload = await fetchJson('api/run-status'); const status = payload.status || {}; state.run = payload.running ? status : status; updateProgress(status, payload.running); el('runStatus').textContent = payload.running ? `Fetching ${status.completed || 0}/${status.targets || 0} · ${status.platform || 'all platforms'} · ${status.mode || 'hybrid'}` : status.state === 'complete' ? `Last run complete at ${displayDate(status.finished_at)} IST` : status.state === 'failed' ? `Last run failed: ${status.error}` : 'Idle'; if (!payload.running) break; await new Promise(resolve => setTimeout(resolve, 1500)); }
@@ -411,6 +437,8 @@ async function pollRunStatus() {
 }
 
 async function openRecords() {
+  // Records modal lets the user delete old runs. The server creates a backup
+  // before it deletes anything.
   el('recordsModal').hidden = false;
   document.body.classList.add('modal-open');
   el('recordsMessage').textContent = 'Loading run list…';
@@ -430,6 +458,7 @@ async function deleteAllRecords() { if (el('deleteConfirmation').value !== 'DELE
 function updateFilter(id, value) { state.filters[id] = value; renderAll(); }
 function clearFilters() { state.filters = { search: '', displayPlatform: '', status: '', dateFrom: '', dateTo: '', missingOnly: false }; for (const id of ['search', 'displayPlatform', 'statusFilter']) el(id).value = ''; el('missingOnly').checked = false; renderAll(); }
 
+// From here down, buttons and form controls are wired to the functions above.
 el('launchFetcher').addEventListener('click', showApp);
 el('launchAccounts').addEventListener('click', () => showAccountPage('launch'));
 el('launchPaste').addEventListener('click', () => showPastePage('launch'));

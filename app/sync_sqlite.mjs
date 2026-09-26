@@ -4,6 +4,8 @@ import { spawn } from 'node:child_process';
 import { DATA_DIR, ROOT, ensureDataDirs, readSnapshots } from './utils.mjs';
 import { datasetTables } from './exports.mjs';
 
+// SQLite is a downloadable copy of the same dataset Excel shows. It is rebuilt
+// from snapshots.csv after each run so there is one simple source of truth.
 export const databasePath = path.join(DATA_DIR, 'follower_tracker.sqlite');
 
 function sqlString(value) {
@@ -22,6 +24,8 @@ function sqlIdentifier(value) {
 }
 
 function buildRunRows(snapshots) {
+  // The UI stores progress in memory while a run is active. This recreates a
+  // permanent run summary from the finished snapshot rows.
   const runs = new Map();
   for (const row of snapshots) {
     if (!runs.has(row.run_id)) runs.set(row.run_id, {
@@ -48,6 +52,8 @@ function buildRunRows(snapshots) {
 }
 
 function buildSql(snapshots) {
+  // Build the database from scratch each time. That keeps the schema easy to
+  // understand and avoids half-updated tables if a previous format changed.
   const tables = datasetTables(snapshots);
   const runRows = buildRunRows(snapshots);
   const dates = tables.flatMap(table => table.dates).sort();
@@ -120,6 +126,8 @@ function buildSql(snapshots) {
 }
 
 async function runWithSqliteCli(sql) {
+  // Newer Node can write SQLite directly. Older runtimes can use sqlite3 if it is
+  // installed on the machine.
   const command = process.env.SQLITE3_BIN || 'sqlite3';
   await new Promise((resolve, reject) => {
     const child = spawn(command, [databasePath], { cwd: ROOT, windowsHide: true });
@@ -132,6 +140,8 @@ async function runWithSqliteCli(sql) {
 }
 
 async function preserveLegacyDatabase() {
+  // If a very old database exists, keep a backup before replacing it with the
+  // current wide, Excel-like table layout.
   try {
     const { DatabaseSync } = await import('node:sqlite');
     const db = new DatabaseSync(databasePath);
@@ -147,6 +157,7 @@ async function preserveLegacyDatabase() {
 }
 
 export async function syncDatabase() {
+  // Rebuild database tables from the latest snapshot history.
   await ensureDataDirs();
   const snapshots = await readSnapshots();
   await preserveLegacyDatabase();

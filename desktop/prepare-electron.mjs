@@ -2,6 +2,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// Before electron-builder runs, make a clean mini-copy of the app. This staged
+// runtime is what the installer ships.
 const desktop = path.dirname(fileURLToPath(import.meta.url));
 const root = path.dirname(desktop);
 const build = path.join(desktop, 'build');
@@ -12,6 +14,8 @@ if (path.dirname(build) !== desktop || path.basename(build) !== 'build') throw n
 await fs.rm(build, { recursive: true, force: true });
 await fs.mkdir(runtime, { recursive: true });
 for (const folder of ['app', 'public', 'sql']) {
+  // Copy source needed at runtime. Skip public/data because it can contain real
+  // collected records from development.
   await fs.cp(path.join(root, folder), path.join(runtime, folder), {
     recursive: true,
     filter: source => folder !== 'public' || path.relative(path.join(root, folder), source) !== 'data',
@@ -24,6 +28,9 @@ await fs.copyFile(path.join(root, 'package.json'), path.join(runtime, 'package.j
 await fs.cp(sourceModules, path.join(runtime, 'node_modules'), {
   recursive: true,
   filter: source => {
+    // Keep the installer smaller by removing caches, tests, type files, maps,
+    // and downloaded browsers. The app can use Edge/Chrome or install browsers
+    // later from the installer option.
     const relative = path.relative(sourceModules, source);
     const segments = relative.split(path.sep);
     const name = segments.at(-1) || '';
@@ -36,6 +43,7 @@ await fs.cp(sourceModules, path.join(runtime, 'node_modules'), {
   },
 });
 for (const relative of ['data', 'public/data']) {
+  // Hard stop if any private collection history accidentally reaches the package.
   if (await fs.access(path.join(runtime, relative)).then(() => true, () => false)) throw new Error(`Collected data must not be packaged: ${relative}`);
 }
 console.log(`Electron runtime prepared with demo accounts and no seed history: ${runtime}`);

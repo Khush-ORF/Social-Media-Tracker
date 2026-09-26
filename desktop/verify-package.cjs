@@ -3,14 +3,19 @@ const path = require('node:path');
 const { createRequire } = require('node:module');
 const { execFileSync } = require('node:child_process');
 
+// electron-builder calls this after packaging. It catches broken installers
+// before they become releases.
 module.exports = async ({ appOutDir }) => {
   const runtime = path.resolve(appOutDir, 'resources', 'runtime');
+  // These files are the minimum the desktop app needs to boot and collect.
   for (const relative of ['app/server.mjs', 'public/app.js', 'accounts.csv', 'node_modules/playwright-core/cli.js']) {
     await fs.access(path.join(runtime, relative));
   }
   execFileSync(process.execPath, [path.join(runtime, 'node_modules/playwright-core/cli.js'), '--version'], { windowsHide: true });
   const runtimeRequire = createRequire(path.join(runtime, 'package.json'));
   for (const dependency of ['exceljs', 'playwright', 'playwright-core']) {
+    // Dependencies must resolve inside the package, not accidentally from this
+    // developer checkout. That mistake would make the installer fail elsewhere.
     const resolved = runtimeRequire.resolve(dependency);
     if (!resolved.startsWith(path.join(runtime, 'node_modules') + path.sep)) {
       throw new Error(`${dependency} resolves outside the packaged runtime: ${resolved}`);
@@ -18,11 +23,13 @@ module.exports = async ({ appOutDir }) => {
     runtimeRequire(dependency);
   }
   for (const relative of ['data', 'public/data']) {
+    // A fresh installer must contain demo data only, never development records.
     if (await fs.access(path.join(runtime, relative)).then(() => true, () => false)) {
       throw new Error(`Private records must not be packaged: ${relative}`);
     }
   }
   const demo = await fs.readFile(path.join(__dirname, 'demo-accounts.csv'));
+  // Prove the packaged accounts.csv is exactly the public demo file.
   if (!demo.equals(await fs.readFile(path.join(runtime, 'accounts.csv')))) {
     throw new Error('Only the demo accounts file may be packaged.');
   }

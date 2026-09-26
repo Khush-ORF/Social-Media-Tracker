@@ -3,6 +3,8 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 
+// Electron is only the desktop shell. The real tracker still runs as the local
+// Node server, then this window opens that server like a private browser tab.
 app.disableHardwareAcceleration();
 
 let window;
@@ -16,6 +18,8 @@ const runtime = app.isPackaged ? path.join(process.resourcesPath, 'runtime') : p
 let browserPreference = '';
 
 async function loadBrowserPreference() {
+  // The installer writes tracker-settings.json. It says whether collection should
+  // use Edge, Chrome, auto-detect, or downloaded Playwright browsers.
   if (process.env.TRACKER_BROWSER_CHANNEL) return process.env.TRACKER_BROWSER_CHANNEL;
   const settingsPath = path.join(app.isPackaged ? path.dirname(process.execPath) : __dirname, 'tracker-settings.json');
   try {
@@ -28,12 +32,16 @@ async function loadBrowserPreference() {
 }
 
 async function seedRecords() {
+  // On first launch, give the user a tiny demo accounts.csv. Existing user data
+  // is left alone forever.
   await fs.mkdir(dataRoot, { recursive: true });
   try { await fs.access(path.join(dataRoot, 'accounts.csv')); return; } catch {}
   await fs.copyFile(path.join(runtime, 'accounts.csv'), path.join(dataRoot, 'accounts.csv'));
 }
 
 function startServer() {
+  // Start the local API in a child process. Electron stays responsive while the
+  // server collects, exports, and saves files.
   return new Promise((resolve, reject) => {
     server = spawn(process.execPath, [path.join(runtime, 'app/server.mjs')], {
       cwd: runtime,
@@ -79,12 +87,16 @@ async function exportFile(filename) {
 }
 
 async function editAccounts() {
+  // The menu opens the real accounts.csv, but only when a run is not currently
+  // writing records.
   const { running } = await fetch(`${serverUrl}/api/run-status`).then(res => res.json());
   if (running) return dialog.showMessageBox(window, { message: 'Wait for collection to finish before editing accounts.' });
   await shell.openPath(path.join(dataRoot, 'accounts.csv'));
 }
 
 function createMenu() {
+  // Keep native menu actions small: open folders, export existing files, or point
+  // people to release information.
   const action = fn => () => Promise.resolve().then(fn).catch(error => dialog.showErrorBox('Action failed', error.message));
   Menu.setApplicationMenu(Menu.buildFromTemplate([
     { label: 'File', submenu: [
@@ -104,6 +116,7 @@ function createMenu() {
 }
 
 async function stopServer() {
+  // Closing the app should also stop the private local server it started.
   if (!server?.pid || server.exitCode !== null) return;
   if (process.platform === 'win32') {
     await new Promise(resolve => {
@@ -115,6 +128,8 @@ async function stopServer() {
 }
 
 async function runSmokeTest() {
+  // CI uses this headless path to prove a packaged app can boot, show the launch
+  // screen, and read a fresh demo-only records folder.
   const smokePayload = await window.webContents.executeJavaScript(`(async () => {
     const deadline = Date.now() + 10000;
     while (Date.now() < deadline && !document.querySelector('#launchAccountMeta')?.textContent.includes('2 organizations')) {
@@ -162,6 +177,8 @@ async function runSmokeTest() {
 
 if (!app.requestSingleInstanceLock()) app.quit();
 else {
+  // A second click on the app icon should focus the existing window instead of
+  // starting another server pointed at the same records.
   app.on('second-instance', () => { if (window) { window.restore(); window.focus(); } });
   app.whenReady().then(async () => {
     await seedRecords();
